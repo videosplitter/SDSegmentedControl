@@ -33,6 +33,7 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
 @interface SDSegmentedControl ()
 
 @property (strong, nonatomic) NSMutableArray *_items;
+@property (strong, nonatomic) NSMutableArray *_onTopItems;
 @property (strong, nonatomic) UIView *_selectedStainView;
 
 @end
@@ -628,6 +629,21 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
         }
 
         UIView.animationsEnabled = animated;
+        for (SDSegmentView *item in self._items)
+        {
+            if (item == selectedItem)
+            {
+                [UIView transitionWithView:item duration:self.animationDuration options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+                    item.selected = YES;
+                } completion:nil];
+            }
+            else if (item.selected)
+            {
+                [UIView transitionWithView:item duration:self.animationDuration options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+                    item.selected = NO;
+                } completion:nil];
+            }
+        }
         [UIView animateWithDuration:animated ? self.animationDuration : 0 animations:^
         {
             self._selectedStainView.frame = stainFrame;
@@ -1251,6 +1267,11 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
                 break;
         }
     }
+}
+
+- (void)setHighlighted:(BOOL)highlighted
+{
+    return;
 }
 
 @end
