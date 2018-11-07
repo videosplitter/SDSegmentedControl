@@ -35,6 +35,7 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
 @property (strong, nonatomic) NSMutableArray *_items;
 @property (strong, nonatomic) NSMutableArray *_onTopItems;
 @property (strong, nonatomic) UIView *_selectedStainView;
+@property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 
 @end
 
@@ -147,6 +148,11 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
 
     // Init stain view
     [_scrollView addSubview:self._selectedStainView = SDStainView.new];
+    
+    // Init pan gesture
+    self.panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureRecognized:)];
+    self.panGestureRecognizer.maximumNumberOfTouches = 1;
+    [self._selectedStainView addGestureRecognizer:self.panGestureRecognizer];
 }
 
 - (UIColor *)backgroundColor
@@ -1056,6 +1062,73 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
     _isScrollingBySelection = NO;
 }
 
+#pragma mark - GenstureRecognizers
+
+- (void)panGestureRecognized:(UIPanGestureRecognizer *)panGestureRecognizer
+{
+    CGPoint translation = [panGestureRecognizer translationInView:panGestureRecognizer.view.superview];
+    
+//    if (self.stylesTitleForSelectedSegment) {
+//        // Style the segment the center of the indicator is covering
+//        [self.segments enumerateObjectsUsingBlock:^(NYSegment *segment, NSUInteger index, BOOL *stop) {
+//            // We get the intersection of the the selected segment indicator's frame and the segment's frame, so the text render view can show text with the selected style in the area covered by the selected segment indicator
+//            CGRect intersectionRect = CGRectIntersection(segment.frame, self.selectedSegmentIndicator.frame);
+//            segment.titleLabel.selectedTextDrawingRect = [segment convertRect:intersectionRect fromView:segment.superview];
+//        }];
+//    }
+    
+    // Find the difference in horizontal position between the current and previous touches
+    CGFloat xDiff = translation.x;
+    
+    // Check that the indicator doesn't exit the bounds of the control
+    CGRect newSegmentIndicatorFrame = self._selectedStainView.frame;
+    newSegmentIndicatorFrame.origin.x += xDiff;
+    
+    CGFloat selectedSegmentIndicatorCenterX;
+    
+    if (CGRectContainsRect(CGRectInset(self.bounds, 0, 0), newSegmentIndicatorFrame)) {
+        selectedSegmentIndicatorCenterX = self._selectedStainView.center.x + xDiff;
+    } else {
+        if (self._selectedStainView.center.x < CGRectGetMidX(self.bounds)) {
+            selectedSegmentIndicatorCenterX = CGRectGetMidX(self._selectedStainView.bounds);
+        } else {
+            selectedSegmentIndicatorCenterX = CGRectGetMaxX(self.bounds) - CGRectGetMidX(self._selectedStainView.bounds);
+        }
+    }
+    
+    self._selectedStainView.center = CGPointMake(selectedSegmentIndicatorCenterX, self._selectedStainView.center.y);
+    
+    [panGestureRecognizer setTranslation:CGPointMake(0, 0) inView:panGestureRecognizer.view.superview];
+    
+    if (panGestureRecognizer.state == UIGestureRecognizerStateBegan)
+    {
+        for (SDSegmentView *item in self._items)
+        {
+            if (item.selected)
+            {
+                [UIView transitionWithView:item duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+                    item.selected = NO;
+                    self._selectedStainView.alpha = 0.5;
+                } completion:nil];
+            }
+        }
+    }
+    
+    if (panGestureRecognizer.state == UIGestureRecognizerStateEnded) {
+        self._selectedStainView.alpha = 1;
+//        [self.segments enumerateObjectsUsingBlock:^(NYSegment *segment, NSUInteger index, BOOL *stop) {
+//            if (CGRectContainsPoint(segment.frame, self.selectedSegmentIndicator.center)) {
+//                [self moveSelectedSegmentIndicatorToSegmentAtIndex:index animated:YES];
+//
+//                if (index != self.selectedSegmentIndex) {
+//                    _selectedSegmentIndex = index;
+//                    [self sendActionsForControlEvents:UIControlEventValueChanged];
+//                }
+//            }
+//        }];
+    }
+}
+
 @end
 
 @interface SDSegmentView ()
@@ -1152,10 +1225,12 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
     [super setSelected:selected];
     if (selected)
     {
+        self.userInteractionEnabled = NO;
         self.titleLabel.font = self.selectedTitleFont ?: self.titleFont;
     }
     else
     {
+        self.userInteractionEnabled = YES;
         self.titleLabel.font = self.titleFont;
     }
 }
