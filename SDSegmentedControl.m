@@ -23,6 +23,10 @@ const CGSize kSDSegmentedControlImageSize = {18, 18};
 
 const CGFloat kSDSegmentedControlScrollOffset = 20;
 
+struct SDSegmentedStainViewDistanceStruct {
+    NSInteger index;
+    CGFloat distance;
+};
 
 @interface SDSegmentView (Private)
 
@@ -33,7 +37,6 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
 @interface SDSegmentedControl ()
 
 @property (strong, nonatomic) NSMutableArray *_items;
-@property (strong, nonatomic) NSMutableArray *_onTopItems;
 @property (strong, nonatomic) UIView *_selectedStainView;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 
@@ -679,6 +682,37 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
     }
 }
 
+- (NSInteger)indexOfNearestButtonToPoint:(CGPoint)point
+{
+    __block struct SDSegmentedStainViewDistanceStruct smallestDistance;
+    smallestDistance.index = -1;
+    smallestDistance.distance = -1;
+    [self._items enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        SDStainView *item = (SDStainView *)obj;
+        if (smallestDistance.index >= 0)
+        {
+            CGFloat distance = [self distanceBetweenPoint:point andPoint:item.center];
+            if (distance < smallestDistance.distance)
+            {
+                smallestDistance.index = idx;
+                smallestDistance.distance = distance;
+            }
+        }
+        else
+        {
+            CGFloat distance = [self distanceBetweenPoint:point andPoint:item.center];
+            smallestDistance.index = idx;
+            smallestDistance.distance = distance;
+        }
+    }];
+    return smallestDistance.index;
+}
+                
+- (CGFloat)distanceBetweenPoint:(CGPoint)firstPoint andPoint:(CGPoint)secondPoint
+{
+    return hypotf(firstPoint.x - secondPoint.x, firstPoint.y - secondPoint.y);
+}
+
 #pragma mark - Draw paths
 // Actually paths are not drawn here, instead they are relayouted
 
@@ -1068,15 +1102,6 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
 {
     CGPoint translation = [panGestureRecognizer translationInView:panGestureRecognizer.view.superview];
     
-//    if (self.stylesTitleForSelectedSegment) {
-//        // Style the segment the center of the indicator is covering
-//        [self.segments enumerateObjectsUsingBlock:^(NYSegment *segment, NSUInteger index, BOOL *stop) {
-//            // We get the intersection of the the selected segment indicator's frame and the segment's frame, so the text render view can show text with the selected style in the area covered by the selected segment indicator
-//            CGRect intersectionRect = CGRectIntersection(segment.frame, self.selectedSegmentIndicator.frame);
-//            segment.titleLabel.selectedTextDrawingRect = [segment convertRect:intersectionRect fromView:segment.superview];
-//        }];
-//    }
-    
     // Find the difference in horizontal position between the current and previous touches
     CGFloat xDiff = translation.x;
     
@@ -1086,13 +1111,16 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
     
     CGFloat selectedSegmentIndicatorCenterX;
     
-    if (CGRectContainsRect(CGRectInset(self.bounds, 0, 0), newSegmentIndicatorFrame)) {
+    CGRect scrollBounds = self.bounds;
+    scrollBounds.size.width = self.scrollView.contentSize.width;
+    
+    if (CGRectContainsRect(CGRectInset(scrollBounds, 0, 0), newSegmentIndicatorFrame)) {
         selectedSegmentIndicatorCenterX = self._selectedStainView.center.x + xDiff;
     } else {
-        if (self._selectedStainView.center.x < CGRectGetMidX(self.bounds)) {
+        if (self._selectedStainView.center.x < CGRectGetMidX(scrollBounds)) {
             selectedSegmentIndicatorCenterX = CGRectGetMidX(self._selectedStainView.bounds);
         } else {
-            selectedSegmentIndicatorCenterX = CGRectGetMaxX(self.bounds) - CGRectGetMidX(self._selectedStainView.bounds);
+            selectedSegmentIndicatorCenterX = CGRectGetMaxX(scrollBounds) - CGRectGetMidX(self._selectedStainView.bounds);
         }
     }
     
@@ -1114,18 +1142,10 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
         }
     }
     
-    if (panGestureRecognizer.state == UIGestureRecognizerStateEnded) {
+    if (panGestureRecognizer.state == UIGestureRecognizerStateEnded || panGestureRecognizer.state == UIGestureRecognizerStateFailed || panGestureRecognizer.state == UIGestureRecognizerStateCancelled) {
         self._selectedStainView.alpha = 1;
-//        [self.segments enumerateObjectsUsingBlock:^(NYSegment *segment, NSUInteger index, BOOL *stop) {
-//            if (CGRectContainsPoint(segment.frame, self.selectedSegmentIndicator.center)) {
-//                [self moveSelectedSegmentIndicatorToSegmentAtIndex:index animated:YES];
-//
-//                if (index != self.selectedSegmentIndex) {
-//                    _selectedSegmentIndex = index;
-//                    [self sendActionsForControlEvents:UIControlEventValueChanged];
-//                }
-//            }
-//        }];
+        [self setSelectedSegmentIndex:[self indexOfNearestButtonToPoint:self._selectedStainView.center]];
+        [self setNeedsLayout];
     }
 }
 

@@ -38,6 +38,9 @@
     
     [self.segmentedControl insertSegmentWithTitle:@"Прогресс" atIndex:0 animated:NO];
     [self.segmentedControl insertSegmentWithTitle:@"Данные" atIndex:1 animated:NO];
+    [self.segmentedControl insertSegmentWithTitle:@"ъ" atIndex:2 animated:NO];
+    [self.segmentedControl insertSegmentWithTitle:@"Данные" atIndex:3 animated:NO];
+    [self.segmentedControl insertSegmentWithTitle:@"Прогресс" atIndex:4 animated:NO];
 }
 
 @end
