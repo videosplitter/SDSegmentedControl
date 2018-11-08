@@ -1,0 +1,29 @@
+PODS:
+  - AtkDragAndDrop (0.2.2)
+  - SDSegmentedControl (1.0.5):
+    - AtkDragAndDrop
+
+DEPENDENCIES:
+  - SDSegmentedControl (from `https://github.com/d1astola/SDSegmentedControl`, branch `master`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - AtkDragAndDrop
+
+EXTERNAL SOURCES:
+  SDSegmentedControl:
+    :branch: master
+    :git: https://github.com/d1astola/SDSegmentedControl
+
+CHECKOUT OPTIONS:
+  SDSegmentedControl:
+    :commit: 420c96b68f29ba7aa41f35d25893845594807951
+    :git: https://github.com/d1astola/SDSegmentedControl
+
+SPEC CHECKSUMS:
+  AtkDragAndDrop: 8c932c5203ab411a24489d36d65a1c02afd9ba27
+  SDSegmentedControl: b15468054d5c917aec8bdef877eb126721e2f602
+
+PODFILE CHECKSUM: c3ab822203e6c982b7b71fec414326e9802ee66e
+
+COCOAPODS: 1.5.3

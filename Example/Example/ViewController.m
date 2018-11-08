@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "SDSegmentedControl.h"
+#import <SDSegmentedControl.h>
 
 @interface ViewController ()
 
