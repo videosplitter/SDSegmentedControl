@@ -11,6 +11,7 @@
 #endif
 
 #import "SDSegmentedControl.h"
+#import <UIScrollView+AtkDragAndDrop.h>
 #import <QuartzCore/QuartzCore.h>
 
 #pragma mark - Constants
@@ -1100,33 +1101,38 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)panGestureRecognized:(UIPanGestureRecognizer *)panGestureRecognizer
 {
-    CGPoint translation = [panGestureRecognizer translationInView:panGestureRecognizer.view.superview];
-    
-    // Find the difference in horizontal position between the current and previous touches
-    CGFloat xDiff = translation.x;
-    
-    // Check that the indicator doesn't exit the bounds of the control
-    CGRect newSegmentIndicatorFrame = self._selectedStainView.frame;
-    newSegmentIndicatorFrame.origin.x += xDiff;
-    
-    CGFloat selectedSegmentIndicatorCenterX;
-    
-    CGRect scrollBounds = self.bounds;
-    scrollBounds.size.width = self.scrollView.contentSize.width;
-    
-    if (CGRectContainsRect(CGRectInset(scrollBounds, 0, 0), newSegmentIndicatorFrame)) {
-        selectedSegmentIndicatorCenterX = self._selectedStainView.center.x + xDiff;
-    } else {
-        if (self._selectedStainView.center.x < CGRectGetMidX(scrollBounds)) {
-            selectedSegmentIndicatorCenterX = CGRectGetMidX(self._selectedStainView.bounds);
+    if (panGestureRecognizer.state == UIGestureRecognizerStateChanged)
+    {
+        CGPoint translation = [panGestureRecognizer translationInView:panGestureRecognizer.view.superview];
+        
+        // Find the difference in horizontal position between the current and previous touches
+        CGFloat xDiff = translation.x;
+        
+        // Check that the indicator doesn't exit the bounds of the control
+        CGRect newSegmentIndicatorFrame = self._selectedStainView.frame;
+        newSegmentIndicatorFrame.origin.x += xDiff;
+        
+        CGFloat selectedSegmentIndicatorCenterX;
+        
+        CGRect scrollBounds = self.bounds;
+        scrollBounds.size.width = self.scrollView.contentSize.width;
+        
+        if (CGRectContainsRect(CGRectInset(scrollBounds, 0, 0), newSegmentIndicatorFrame)) {
+            selectedSegmentIndicatorCenterX = self._selectedStainView.center.x + xDiff;
         } else {
-            selectedSegmentIndicatorCenterX = CGRectGetMaxX(scrollBounds) - CGRectGetMidX(self._selectedStainView.bounds);
+            if (self._selectedStainView.center.x < CGRectGetMidX(scrollBounds)) {
+                selectedSegmentIndicatorCenterX = CGRectGetMidX(self._selectedStainView.bounds);
+            } else {
+                selectedSegmentIndicatorCenterX = CGRectGetMaxX(scrollBounds) - CGRectGetMidX(self._selectedStainView.bounds);
+            }
         }
+        
+        self._selectedStainView.center = CGPointMake(selectedSegmentIndicatorCenterX, self._selectedStainView.center.y);
+        
+        [self.scrollView autoScrollDragMoved:[panGestureRecognizer locationInView:panGestureRecognizer.view.superview]];
+        
+        [panGestureRecognizer setTranslation:CGPointMake(0, 0) inView:panGestureRecognizer.view.superview];
     }
-    
-    self._selectedStainView.center = CGPointMake(selectedSegmentIndicatorCenterX, self._selectedStainView.center.y);
-    
-    [panGestureRecognizer setTranslation:CGPointMake(0, 0) inView:panGestureRecognizer.view.superview];
     
     if (panGestureRecognizer.state == UIGestureRecognizerStateBegan)
     {
@@ -1140,10 +1146,12 @@ struct SDSegmentedStainViewDistanceStruct {
                 } completion:nil];
             }
         }
+        [self.scrollView autoScrollDragStarted];
     }
     
     if (panGestureRecognizer.state == UIGestureRecognizerStateEnded || panGestureRecognizer.state == UIGestureRecognizerStateFailed || panGestureRecognizer.state == UIGestureRecognizerStateCancelled) {
         self._selectedStainView.alpha = 1;
+        [self.scrollView autoScrollDragEnded];
         [self setSelectedSegmentIndex:[self indexOfNearestButtonToPoint:self._selectedStainView.center]];
         [self setNeedsLayout];
     }
