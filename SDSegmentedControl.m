@@ -40,6 +40,7 @@ struct SDSegmentedStainViewDistanceStruct {
 @property (strong, nonatomic) NSMutableArray *_items;
 @property (strong, nonatomic) UIView *_selectedStainView;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
+@property (assign, nonatomic) CGPoint previousScrollViewOffset;
 
 @end
 
@@ -1089,7 +1090,18 @@ struct SDSegmentedStainViewDistanceStruct {
     if (_isScrollingBySelection || _selectedSegmentIndex == UISegmentedControlNoSegment) return;
     CGFloat selectedItemCenterPosition = ((SDSegmentView *)self._items[self.selectedSegmentIndex]).center.x;
     [self drawPathsToPosition:selectedItemCenterPosition - scrollView.contentOffset.x animated:NO];
-    self._selectedStainView.center = CGPointMake(selectedItemCenterPosition, self._selectedStainView.center.y);
+    if (self.panGestureRecognizer.state == UIGestureRecognizerStateChanged)
+    {
+        if (!CGPointEqualToPoint(self.previousScrollViewOffset, CGPointZero))
+        {
+            self._selectedStainView.center = CGPointMake(self._selectedStainView.center.x - (self.previousScrollViewOffset.x - self.scrollView.contentOffset.x), self._selectedStainView.center.y);
+        }
+        self.previousScrollViewOffset = scrollView.contentOffset;
+    }
+    else
+    {
+        self._selectedStainView.center = CGPointMake(selectedItemCenterPosition, self._selectedStainView.center.y);
+    }
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
@@ -1129,9 +1141,8 @@ struct SDSegmentedStainViewDistanceStruct {
         
         self._selectedStainView.center = CGPointMake(selectedSegmentIndicatorCenterX, self._selectedStainView.center.y);
         
-        [self.scrollView autoScrollDragMoved:[panGestureRecognizer locationInView:panGestureRecognizer.view.superview]];
-        
         [panGestureRecognizer setTranslation:CGPointMake(0, 0) inView:panGestureRecognizer.view.superview];
+        [self.scrollView autoScrollDragMoved:[panGestureRecognizer locationInView:panGestureRecognizer.view.superview]];
     }
     
     if (panGestureRecognizer.state == UIGestureRecognizerStateBegan)
