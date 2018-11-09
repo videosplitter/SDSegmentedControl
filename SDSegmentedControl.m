@@ -1191,6 +1191,7 @@ struct SDSegmentedStainViewDistanceStruct {
         [self setSelectedSegmentIndex:[self indexOfNearestButtonToPoint:self.selectedStainView.center]];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
         [self setNeedsLayout];
+        self.previousScrollViewOffset = CGPointZero;
     }
 }
 
