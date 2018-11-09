@@ -4,12 +4,6 @@
 //  Contributed by Marius Rackwitz on 19/10/12
 //
 
-#ifdef NSFoundationVersionNumber_iOS_6_1
-#define SD_IS_IOS7 (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
-#else
-#define SD_IS_IOS7 NO
-#endif
-
 #import "SDSegmentedControl.h"
 #import <UIScrollView+AtkDragAndDrop.h>
 #import <QuartzCore/QuartzCore.h>
@@ -62,7 +56,8 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (instancetype)init
 {
-    if ((self = [super init]))
+    self = [super init];
+    if (self)
     {
         [self commonInit];
     }
@@ -71,7 +66,8 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (instancetype)initWithItems:(NSArray *)items
 {
-    if ((self = [self init]))
+    self = [super init];
+    if (self)
     {
         [items enumerateObjectsUsingBlock:^(id title, NSUInteger idx, BOOL *stop)
         {
@@ -118,33 +114,14 @@ struct SDSegmentedStainViewDistanceStruct {
 
     // Init layer
     self.layer.backgroundColor = UIColor.clearColor.CGColor;
-    if (!SD_IS_IOS7)
-    {
-        self.backgroundColor = [UIColor colorWithRed:0.961 green:0.961 blue:0.961 alpha:1];
-        self.shadowColor = UIColor.blackColor;
-        self.shadowRadius = .8;
-        self.shadowOpacity = .6;
-        self.shadowOffset = CGSizeMake(0, 1);
-    }
-    else
-    {
-        self.backgroundColor = [UIColor clearColor];
-    }
-
+    self.backgroundColor = [UIColor clearColor];
+    
     // Init border bottom layer
     self.borderBottomLayer = CAShapeLayer.layer;
     [self.layer addSublayer:self.borderBottomLayer];
-    if (!SD_IS_IOS7)
-    {
-        self.borderColor = UIColor.whiteColor;
-        self.borderWidth = .5;
-    }
-    else
-    {
-        self.borderColor = UIColor.blackColor;
-        self.borderWidth = .25;
-    }
-
+    self.borderColor = UIColor.blackColor;
+    self.borderWidth = .25;
+    
     self.borderBottomLayer.fillColor = nil;
     // Init scrollView
     self.scrollView = [UIScrollView new];
@@ -1217,13 +1194,6 @@ struct SDSegmentedStainViewDistanceStruct {
     [appearance setTitleColor:[UIColor colorWithWhite:0.235 alpha:1] forState:UIControlStateSelected];
     [appearance setTitleColor:[UIColor colorWithWhite:0.800 alpha:1] forState:UIControlStateDisabled];
     [appearance setIsNewCircleColor:[UIColor orangeColor]];
-    
-    if (!SD_IS_IOS7)
-    {
-        [appearance setTitleShadowColor:UIColor.whiteColor forState:UIControlStateNormal];
-        [appearance setTitleShadowColor:UIColor.whiteColor forState:UIControlStateSelected];
-        [appearance setTitleShadowColor:UIColor.clearColor forState:UIControlStateDisabled];
-    }
 }
 
 + (instancetype)new
@@ -1238,21 +1208,13 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
-    if ((self = [super initWithFrame:frame]))
+    self = [super initWithFrame:frame];
+    if (self)
     {
         _imageSize = kSDSegmentedControlImageSize;
-
-        if (!SD_IS_IOS7)
-        {
-            self.titleShadowOffset = CGSizeMake(0, 0.5);
-            self.titleFont = [UIFont boldSystemFontOfSize:14];
-        }
-        else
-        {
-            self.titleFont = [UIFont systemFontOfSize:14];
-            self.selectedTitleFont = [UIFont boldSystemFontOfSize:14];
-        }
-
+        self.titleFont = [UIFont systemFontOfSize:14];
+        self.selectedTitleFont = [UIFont boldSystemFontOfSize:14];
+        
         self.userInteractionEnabled = YES;
         self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         self.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
@@ -1377,46 +1339,43 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)tintColorDidChange
 {
-    if (SD_IS_IOS7)
+    [super tintColorDidChange];
+    
+    switch (self.tintAdjustmentMode)
     {
-        [super tintColorDidChange];
-        
-        switch (self.tintAdjustmentMode)
-        {
-            case UIViewTintAdjustmentModeAutomatic:
-            case UIViewTintAdjustmentModeNormal:
-                
-                if (self.titleColorNormal)
-                {
-                    [self setTitleColor:self.titleColorNormal forState:UIControlStateNormal];
-                    self.titleColorNormal = nil;
-                }
-                
-                if (self.titleColorSelected)
-                {
-                    [self setTitleColor:self.titleColorSelected forState:UIControlStateSelected];
-                    self.titleColorSelected = nil;
-                }
-                
-                if (self.titleColorDisabled)
-                {
-                    [self setTitleColor:self.titleColorDisabled forState:UIControlStateDisabled];
-                    self.titleColorDisabled = nil;
-                }
-
-                break;
-            case UIViewTintAdjustmentModeDimmed:
-                
-                self.titleColorNormal = [self titleColorForState:UIControlStateNormal];
-                self.titleColorSelected = [self titleColorForState:UIControlStateSelected];
-                self.titleColorDisabled = [self titleColorForState:UIControlStateDisabled];
-                
-                [self setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
-                [self setTitleColor:[UIColor grayColor] forState:UIControlStateSelected];
-                [self setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-                
-                break;
-        }
+        case UIViewTintAdjustmentModeAutomatic:
+        case UIViewTintAdjustmentModeNormal:
+            
+            if (self.titleColorNormal)
+            {
+                [self setTitleColor:self.titleColorNormal forState:UIControlStateNormal];
+                self.titleColorNormal = nil;
+            }
+            
+            if (self.titleColorSelected)
+            {
+                [self setTitleColor:self.titleColorSelected forState:UIControlStateSelected];
+                self.titleColorSelected = nil;
+            }
+            
+            if (self.titleColorDisabled)
+            {
+                [self setTitleColor:self.titleColorDisabled forState:UIControlStateDisabled];
+                self.titleColorDisabled = nil;
+            }
+            
+            break;
+        case UIViewTintAdjustmentModeDimmed:
+            
+            self.titleColorNormal = [self titleColorForState:UIControlStateNormal];
+            self.titleColorSelected = [self titleColorForState:UIControlStateSelected];
+            self.titleColorDisabled = [self titleColorForState:UIControlStateDisabled];
+            
+            [self setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+            [self setTitleColor:[UIColor grayColor] forState:UIControlStateSelected];
+            [self setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+            
+            break;
     }
 }
 
@@ -1500,20 +1459,7 @@ struct SDSegmentedStainViewDistanceStruct {
     [super initialize];
     SDStainView *appearance = [self appearance];
     appearance.edgeInsets = UIEdgeInsetsMake(-.5, -.5, -.5, -.5);
-
-    if (!SD_IS_IOS7)
-    {
-        appearance.innerStrokeLineWidth = 1.5;
-        appearance.innerStrokeColor = UIColor.whiteColor;
-        appearance.backgroundColor = [UIColor colorWithWhite:0.816 alpha:1];
-        appearance.shadowOffset = CGSizeMake(0, .5);
-        appearance.shadowBlur = 2.5;
-        appearance.shadowColor = UIColor.blackColor;
-    }
-    else
-    {
-        appearance.backgroundColor = [UIColor clearColor];
-    }
+    appearance.backgroundColor = [UIColor clearColor];
 }
 
 + (instancetype)appearance
@@ -1523,7 +1469,8 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (instancetype)init
 {
-    if ((self = [super init]))
+    self = [super init];
+    if (self)
     {
         self.clipsToBounds = YES;
     }
@@ -1625,11 +1572,8 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)tintColorDidChange
 {
-    if (SD_IS_IOS7)
-    {
-        [super tintColorDidChange];
-        [self setNeedsDisplay];
-    }
+    [super tintColorDidChange];
+    [self setNeedsDisplay];
 }
 
 @end
