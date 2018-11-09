@@ -672,16 +672,16 @@ struct SDSegmentedStainViewDistanceStruct {
             }
         }
         [UIView animateWithDuration:animated ? self.animationDuration : 0 animations:^
-        {
-        }
-        completion:^(BOOL finished)
-        {
-            {
-                item.selected = item == selectedItem;
-            }
-        }];
+         {
              self.selectedStainView.frame = stainFrame;
+         }
+                         completion:^(BOOL finished)
+         {
              for (SDSegmentView *item in self.items)
+             {
+                 item.selected = item == selectedItem;
+             }
+         }];
         UIView.animationsEnabled = YES;
     }
 
