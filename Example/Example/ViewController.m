@@ -12,6 +12,7 @@
 @interface ViewController ()
 
 @property (weak, nonatomic) IBOutlet SDSegmentedControl *segmentedControl;
+@property (weak, nonatomic) IBOutlet UILabel *currentTabLabel;
 
 @end
 
@@ -32,7 +33,6 @@
     [segmenteViewAppearance setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [segmenteViewAppearance setTitleColor:[UIColor colorWithRed:0 green:84/255.0 blue:108/255.0 alpha:1.f] forState:UIControlStateSelected];
     
-    
     SDStainView *stainViewAppearance = SDStainView.appearance;
     stainViewAppearance.backgroundColor = [UIColor whiteColor];
     
@@ -41,6 +41,27 @@
     [self.segmentedControl insertSegmentWithTitle:@"ъ" atIndex:2 animated:NO];
     [self.segmentedControl insertSegmentWithTitle:@"Данные" atIndex:3 animated:NO];
     [self.segmentedControl insertSegmentWithTitle:@"Прогресс" atIndex:4 animated:NO];
+    [self.segmentedControl insertIsNewAtSegmentIndex:2];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self.segmentedControl insertIsNewAtSegmentIndex:0];
+}
+
+- (IBAction)addIsNewAction:(id)sender
+{
+    [self.segmentedControl insertIsNewAtSegmentIndex:3];
+}
+
+- (IBAction)removeIsNewAction:(id)sender
+{
+    [self.segmentedControl removeIsNewAtSegmentIndex:3];
+}
+
+- (IBAction)segmentedControlTabChanged:(id)sender
+{
+    self.currentTabLabel.text = [NSString stringWithFormat:@"%ld", (long)self.segmentedControl.selectedSegmentIndex];
 }
 
 @end

@@ -12,6 +12,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ViewController">
             <connections>
+                <outlet property="currentTabLabel" destination="tKm-zv-7HA" id="eTQ-VG-boD"/>
                 <outlet property="segmentedControl" destination="Nd8-io-R5D" id="2H9-MU-l4q"/>
                 <outlet property="view" destination="6" id="7"/>
             </connections>
@@ -27,10 +28,47 @@
                     <constraints>
                         <constraint firstAttribute="height" constant="27" id="O9E-eC-9Ud"/>
                     </constraints>
+                    <connections>
+                        <action selector="segmentedControlTabChanged:" destination="-1" eventType="valueChanged" id="Nny-YG-2lV"/>
+                    </connections>
                 </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qfq-Pg-QMo">
+                    <rect key="frame" x="50" y="121" width="75" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="RjA-lk-io4"/>
+                        <constraint firstAttribute="width" constant="75" id="vNY-sx-0Ux"/>
+                    </constraints>
+                    <state key="normal" title="add isNew"/>
+                    <connections>
+                        <action selector="addIsNewAction:" destination="-1" eventType="touchUpInside" id="aqc-HS-A2f"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XuK-zj-JrP">
+                    <rect key="frame" x="50" y="159" width="100" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="1Fw-nJ-oEr"/>
+                        <constraint firstAttribute="width" constant="100" id="YWG-ZB-Aub"/>
+                    </constraints>
+                    <state key="normal" title="remove isNew"/>
+                    <connections>
+                        <action selector="removeIsNewAction:" destination="-1" eventType="touchUpInside" id="kbs-b1-8Uq"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tKm-zv-7HA">
+                    <rect key="frame" x="166.66666666666666" y="91" width="41.666666666666657" height="20.333333333333329"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
+                <constraint firstItem="Qfq-Pg-QMo" firstAttribute="top" secondItem="Nd8-io-R5D" secondAttribute="bottom" constant="50" id="3Ec-BJ-kTv"/>
+                <constraint firstItem="XuK-zj-JrP" firstAttribute="top" secondItem="Qfq-Pg-QMo" secondAttribute="bottom" constant="8" id="7ld-Yg-QaB"/>
+                <constraint firstItem="tKm-zv-7HA" firstAttribute="top" secondItem="Nd8-io-R5D" secondAttribute="bottom" constant="20" id="9q4-5A-vcl"/>
+                <constraint firstItem="XuK-zj-JrP" firstAttribute="leading" secondItem="NAE-vn-Co7" secondAttribute="leading" constant="50" id="H79-cC-45H"/>
+                <constraint firstItem="Qfq-Pg-QMo" firstAttribute="leading" secondItem="NAE-vn-Co7" secondAttribute="leading" constant="50" id="XkH-mL-iGL"/>
+                <constraint firstItem="tKm-zv-7HA" firstAttribute="centerX" secondItem="NAE-vn-Co7" secondAttribute="centerX" id="cb6-sg-THL"/>
                 <constraint firstItem="Nd8-io-R5D" firstAttribute="leading" secondItem="6" secondAttribute="leading" id="dCW-Bs-xhX"/>
                 <constraint firstItem="Nd8-io-R5D" firstAttribute="top" secondItem="NAE-vn-Co7" secondAttribute="top" id="qTP-e6-Pva"/>
                 <constraint firstAttribute="trailing" secondItem="Nd8-io-R5D" secondAttribute="trailing" id="s8X-NW-fp3"/>
