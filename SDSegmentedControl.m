@@ -36,7 +36,7 @@ struct SDSegmentedStainViewDistanceStruct {
 
 @end
 
-@interface SDSegmentedControl ()
+@interface SDSegmentedControl () <UIScrollViewDelegate>
 
 @property (strong, nonatomic) NSMutableArray *items;
 @property (strong, nonatomic) UIView *selectedStainView;
@@ -46,6 +46,7 @@ struct SDSegmentedStainViewDistanceStruct {
 @property (copy,   nonatomic) void (^lastCompletionBlock)();
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 @property (assign, nonatomic) CGPoint previousScrollViewOffset;
+@property (strong, nonatomic) UIScrollView *scrollView;
 
 @end
 
@@ -146,8 +147,9 @@ struct SDSegmentedStainViewDistanceStruct {
 
     self.borderBottomLayer.fillColor = nil;
     // Init scrollView
-    [self addSubview:_scrollView = UIScrollView.new];
-
+    self.scrollView = [UIScrollView new];
+    [self addSubview:self.scrollView];
+    
     self.scrollView.delegate = self;
     self.scrollView.scrollsToTop = NO;
     self.scrollView.backgroundColor = UIColor.clearColor;

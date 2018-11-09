@@ -19,7 +19,7 @@ typedef enum {
     SDSegmentedArrowPositionTop
 } SDSegmentedArrowPosition;
 
-@interface SDSegmentedControl : UISegmentedControl <UIScrollViewDelegate>
+@interface SDSegmentedControl : UISegmentedControl
 
 @property (strong, nonatomic) UIColor *backgroundColor UI_APPEARANCE_SELECTOR;
 @property (strong, nonatomic) UIColor *borderColor UI_APPEARANCE_SELECTOR;
@@ -37,7 +37,6 @@ typedef enum {
 @property (strong, nonatomic) UIFont *titleFont UI_APPEARANCE_SELECTOR;
 @property (strong, nonatomic) UIFont *selectedTitleFont UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) BOOL centerSegmentsIfPossible UI_APPEARANCE_SELECTOR;
-@property (strong, nonatomic) UIScrollView *scrollView;
 - (void)insertIsNewAtSegmentIndex:(NSInteger)index;
 - (void)removeIsNewAtSegmentIndex:(NSInteger)index;
 
