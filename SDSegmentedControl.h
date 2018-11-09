@@ -21,8 +21,8 @@ typedef enum {
 
 @interface SDSegmentedControl : UISegmentedControl <UIScrollViewDelegate>
 
-@property (retain, nonatomic) UIColor *backgroundColor UI_APPEARANCE_SELECTOR;
-@property (retain, nonatomic) UIColor *borderColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *backgroundColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *borderColor UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat borderWidth UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat arrowSize UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) SDSegmentedArrowPosition arrowPosition UI_APPEARANCE_SELECTOR;
@@ -30,15 +30,14 @@ typedef enum {
 @property (assign, nonatomic) CFTimeInterval animationDuration UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat interItemSpace UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) UIEdgeInsets stainEdgeInsets UI_APPEARANCE_SELECTOR;
-@property (retain, nonatomic) UIColor *shadowColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *shadowColor UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat shadowRadius UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat shadowOpacity UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGSize shadowOffset UI_APPEARANCE_SELECTOR;
-@property (retain, nonatomic) UIFont *titleFont UI_APPEARANCE_SELECTOR;
-@property (retain, nonatomic) UIFont *selectedTitleFont UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIFont *titleFont UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIFont *selectedTitleFont UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) BOOL centerSegmentsIfPossible UI_APPEARANCE_SELECTOR;
-
-@property (assign,nonatomic) UIScrollView *scrollView;
+@property (strong, nonatomic) UIScrollView *scrollView;
 - (void)insertIsNewAtSegmentIndex:(NSInteger)index;
 - (void)removeIsNewAtSegmentIndex:(NSInteger)index;
 
@@ -47,23 +46,23 @@ typedef enum {
 @interface SDSegmentView : UIButton
 
 @property (assign, nonatomic) CGSize imageSize UI_APPEARANCE_SELECTOR;
-@property (retain, nonatomic) UIFont *titleFont;
-@property (retain, nonatomic) UIFont *selectedTitleFont;
+@property (strong, nonatomic) UIFont *titleFont;
+@property (strong, nonatomic) UIFont *selectedTitleFont;
 @property (assign, nonatomic) CGSize titleShadowOffset UI_APPEARANCE_SELECTOR;
-@property (retain, nonatomic) UIColor *isNewCircleColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *isNewCircleColor UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) BOOL isNew;
 
 @end
 
 @interface SDStainView : UIView <UIAppearance>
 
-@property (retain, nonatomic) UIColor *backgroundColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *backgroundColor UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat cornerRadius UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) UIEdgeInsets edgeInsets UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGSize shadowOffset UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat shadowBlur UI_APPEARANCE_SELECTOR;
-@property (assign, nonatomic) UIColor *shadowColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *shadowColor UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat innerStrokeLineWidth UI_APPEARANCE_SELECTOR;
-@property (assign, nonatomic) UIColor *innerStrokeColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *innerStrokeColor UI_APPEARANCE_SELECTOR;
 
 @end

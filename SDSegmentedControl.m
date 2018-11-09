@@ -38,8 +38,12 @@ struct SDSegmentedStainViewDistanceStruct {
 
 @interface SDSegmentedControl ()
 
-@property (strong, nonatomic) NSMutableArray *_items;
-@property (strong, nonatomic) UIView *_selectedStainView;
+@property (strong, nonatomic) NSMutableArray *items;
+@property (strong, nonatomic) UIView *selectedStainView;
+@property (assign, nonatomic) NSInteger lastSelectedSegmentIndex;
+@property (strong, nonatomic) CAShapeLayer *borderBottomLayer;
+@property (assign, nonatomic) BOOL isScrollingBySelection;
+@property (copy,   nonatomic) void (^lastCompletionBlock)();
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 @property (assign, nonatomic) CGPoint previousScrollViewOffset;
 
@@ -48,10 +52,6 @@ struct SDSegmentedStainViewDistanceStruct {
 @implementation SDSegmentedControl
 {
     NSInteger _selectedSegmentIndex;
-    NSInteger _lastSelectedSegmentIndex;
-    CAShapeLayer *_borderBottomLayer;
-    BOOL _isScrollingBySelection;
-    void (^lastCompletionBlock)();
 }
 
 + (Class)layerClass
@@ -59,7 +59,7 @@ struct SDSegmentedStainViewDistanceStruct {
     return CAShapeLayer.class;
 }
 
-- (id)init
+- (instancetype)init
 {
     if ((self = [super init]))
     {
@@ -68,7 +68,7 @@ struct SDSegmentedStainViewDistanceStruct {
     return self;
 }
 
-- (id)initWithItems:(NSArray *)items
+- (instancetype)initWithItems:(NSArray *)items
 {
     if ((self = [self init]))
     {
@@ -99,14 +99,14 @@ struct SDSegmentedStainViewDistanceStruct {
     self.frame = frame;
 
     // Init properties
-    _lastSelectedSegmentIndex = UISegmentedControlNoSegment;
+    self.lastSelectedSegmentIndex = UISegmentedControlNoSegment;
     _selectedSegmentIndex = UISegmentedControlNoSegment;
     _arrowHeightFactor = -1.0;
     _arrowPosition = SDSegmentedArrowPositionBottom;
     _interItemSpace = kSDSegmentedControlInterItemSpace;
     _stainEdgeInsets = kSDSegmentedControlStainEdgeInsets;
-    __items = NSMutableArray.new;
 
+    _items = NSMutableArray.new;
     // Appearance properties
     _animationDuration = kSDSegmentedControlDefaultDuration;
     _arrowSize = kSDSegmentedControlArrowSize;
@@ -131,7 +131,8 @@ struct SDSegmentedStainViewDistanceStruct {
     }
 
     // Init border bottom layer
-    [self.layer addSublayer:_borderBottomLayer = CAShapeLayer.layer];
+    self.borderBottomLayer = CAShapeLayer.layer;
+    [self.layer addSublayer:self.borderBottomLayer];
     if (!SD_IS_IOS7)
     {
         self.borderColor = UIColor.whiteColor;
@@ -142,23 +143,23 @@ struct SDSegmentedStainViewDistanceStruct {
         self.borderColor = UIColor.blackColor;
         self.borderWidth = .25;
     }
-    _borderBottomLayer.fillColor = nil;
 
+    self.borderBottomLayer.fillColor = nil;
     // Init scrollView
     [self addSubview:_scrollView = UIScrollView.new];
-    _scrollView.delegate = self;
-    _scrollView.scrollsToTop = NO;
-    _scrollView.backgroundColor = UIColor.clearColor;
-    _scrollView.showsHorizontalScrollIndicator = NO;
-    _scrollView.showsVerticalScrollIndicator = NO;
 
+    self.scrollView.delegate = self;
+    self.scrollView.scrollsToTop = NO;
+    self.scrollView.backgroundColor = UIColor.clearColor;
+    self.scrollView.showsHorizontalScrollIndicator = NO;
+    self.scrollView.showsVerticalScrollIndicator = NO;
     // Init stain view
-    [_scrollView addSubview:self._selectedStainView = SDStainView.new];
+    [self.scrollView addSubview:self.selectedStainView = SDStainView.new];
     
     // Init pan gesture
     self.panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureRecognized:)];
     self.panGestureRecognizer.maximumNumberOfTouches = 1;
-    [self._selectedStainView addGestureRecognizer:self.panGestureRecognizer];
+    [self.selectedStainView addGestureRecognizer:self.panGestureRecognizer];
 }
 
 - (UIColor *)backgroundColor
@@ -223,34 +224,34 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (UIColor *)borderColor
 {
-    return [UIColor colorWithCGColor:_borderBottomLayer.strokeColor];
+    return [UIColor colorWithCGColor:self.borderBottomLayer.strokeColor];
 }
 
 - (void)setBorderColor:(UIColor *)borderColor
 {
-    _borderBottomLayer.strokeColor = borderColor.CGColor;
+    self.borderBottomLayer.strokeColor = borderColor.CGColor;
 }
 
 - (void)setTitleFont:(UIFont *)titleFont
 {
   _titleFont = titleFont;
   
-  for (int i = 0; i < self._items.count; i++)
   {
-    SDSegmentView *segmentView = (SDSegmentView *)self._items[i];
     segmentView.titleFont = titleFont;
   }
+    for (int i = 0; i < self.items.count; i++)
+        SDSegmentView *segmentView = (SDSegmentView *)self.items[i];
 }
 
 - (void)setSelectedTitleFont:(UIFont *)selectedTitleFont
 {
   _selectedTitleFont = selectedTitleFont;
   
-  for (int i = 0; i < self._items.count; i++)
   {
-    SDSegmentView *segmentView = (SDSegmentView *)self._items[i];
     segmentView.selectedTitleFont = selectedTitleFont;
   }
+    for (int i = 0; i < self.items.count; i++)
+        SDSegmentView *segmentView = (SDSegmentView *)self.items[i];
 }
 
 
@@ -277,7 +278,7 @@ struct SDSegmentedStainViewDistanceStruct {
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index
 {
     index = MAX(MIN(index, self.numberOfSegments - 1), 0);
-    UIButton *segmentView = self._items[index];
+    UIButton *segmentView = self.items[index];
     [segmentView setTitle:title forState:UIControlStateNormal];
     [segmentView sizeToFit];
     [self setNeedsLayout];
@@ -286,7 +287,7 @@ struct SDSegmentedStainViewDistanceStruct {
 - (NSString *)titleForSegmentAtIndex:(NSUInteger)index
 {
     index = MAX(MIN(index, self.numberOfSegments - 1), 0);
-    UIButton *segmentView = self._items[index];
+    UIButton *segmentView = self.items[index];
     return [segmentView titleForState:UIControlStateNormal];
 }
 
@@ -297,16 +298,15 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)removeSegmentAtIndex:(NSUInteger)index animated:(BOOL)animated
 {
-    if (self._items.count == 0) return;
+    if (self.items.count == 0) return;
     index = MAX(MIN(index, self.numberOfSegments - 1), 0);
-    UIView *segmentView = self._items[index];
-    [self._items removeObject:segmentView];
-
+    UIView *segmentView = self.items[index];
+    [self.items removeObject:segmentView];
     if (self.selectedSegmentIndex >= 0)
     {
         BOOL changed = NO;
-
-        if (self._items.count == 1)
+        
+        if (self.items.count == 1)
         {
             // Deselect if there is no item
             self.selectedSegmentIndex = UISegmentedControlNoSegment;
@@ -324,8 +324,8 @@ struct SDSegmentedStainViewDistanceStruct {
         }
 
         // It is important to set both, this will fix the animation.
-        _lastSelectedSegmentIndex = self.selectedSegmentIndex;
 
+        self.lastSelectedSegmentIndex = self.selectedSegmentIndex;
         if (changed)
         {
             [self sendActionsForControlEvents:UIControlEventValueChanged];
@@ -353,15 +353,15 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)removeAllSegments
 {
-    [self._items makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    [self._items removeAllObjects];
+    [self.items makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [self.items removeAllObjects];
     self.selectedSegmentIndex = UISegmentedControlNoSegment;
     [self setNeedsLayout];
 }
 
 - (NSUInteger)numberOfSegments
 {
-    return self._items.count;
+    return self.items.count;
 }
 
 - (void)setEnabled:(BOOL)enabled forSegmentAtIndex:(NSUInteger)index
@@ -383,11 +383,11 @@ struct SDSegmentedStainViewDistanceStruct {
 {
     if (_selectedSegmentIndex != selectedSegmentIndex)
     {
-        if (selectedSegmentIndex >= (NSInteger)self._items.count)
+        if (selectedSegmentIndex >= (NSInteger)self.items.count)
         {
-            selectedSegmentIndex = self._items.count - 1;
+            selectedSegmentIndex = self.items.count - 1;
         }
-        _lastSelectedSegmentIndex = _selectedSegmentIndex;
+        self.lastSelectedSegmentIndex = _selectedSegmentIndex;
         _selectedSegmentIndex = selectedSegmentIndex;
         [self setNeedsLayout];
     }
@@ -416,13 +416,13 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)insertIsNewAtSegmentIndex:(NSInteger)index
 {
-    SDSegmentView *segmentView = self._items[index];
+    SDSegmentView *segmentView = self.items[index];
     segmentView.isNew = YES;
 }
 
 - (void)removeIsNewAtSegmentIndex:(NSInteger)index
 {
-    SDSegmentView *segmentView = self._items[index];
+    SDSegmentView *segmentView = self.items[index];
     segmentView.isNew = NO;
 }
 
@@ -440,25 +440,25 @@ struct SDSegmentedStainViewDistanceStruct {
     [segmentView sizeToFit];
 
     index = MAX(MIN(index, self.numberOfSegments), 0);
-    if (index < self._items.count)
+    if (index < self.items.count)
     {
-        segmentView.center = ((UIView *)self._items[index]).center;
-        [self.scrollView insertSubview:segmentView belowSubview:self._items[index]];
-        [self._items insertObject:segmentView atIndex:index];
+        segmentView.center = ((UIView *)self.items[index]).center;
+        [self.scrollView insertSubview:segmentView belowSubview:self.items[index]];
+        [self.items insertObject:segmentView atIndex:index];
     }
     else
     {
         segmentView.center = self.center;
         [self.scrollView addSubview:segmentView];
-        [self._items addObject:segmentView];
+        [self.items addObject:segmentView];
     }
 
-    if (self.selectedSegmentIndex >= index && self.selectedSegmentIndex + 1 < self._items.count)
+    if (self.selectedSegmentIndex >= index && self.selectedSegmentIndex + 1 < self.items.count)
     {
         self.selectedSegmentIndex++;
     }
-    _lastSelectedSegmentIndex = self.selectedSegmentIndex;
 
+    self.lastSelectedSegmentIndex = self.selectedSegmentIndex;
     if (animated)
     {
         [UIView animateWithDuration:.4 animations:^
@@ -475,9 +475,9 @@ struct SDSegmentedStainViewDistanceStruct {
 - (NSInteger)firstEnabledSegmentIndexNearIndex:(NSUInteger)index
 {
     // Select the first enabled segment
-    for (int i = index; i < self._items.count; i++)
+    for (int i = index; i < self.items.count; i++)
     {
-        if (((SDSegmentView *)self._items[i]).enabled)
+        if (((SDSegmentView *)self.items[i]).enabled)
         {
             return i;
         }
@@ -485,7 +485,7 @@ struct SDSegmentedStainViewDistanceStruct {
 
     for (int i = index; i >= 0; i--)
     {
-        if (((SDSegmentView *)self._items[i]).enabled)
+        if (((SDSegmentView *)self.items[i]).enabled)
         {
             return i;
         }
@@ -496,8 +496,8 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (SDSegmentView *)segmentAtIndex:(NSUInteger)index
 {
-    NSParameterAssert(index >= 0 && index < self._items.count);
-    return self._items[index];
+    NSParameterAssert(index >= 0 && index < self.items.count);
+    return self.items[index];
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview
@@ -514,9 +514,10 @@ struct SDSegmentedStainViewDistanceStruct {
 }
 
 // Layout Needed when switching from and to the View embedding an SDSegmentedControl using a Tab Bar
-- (void)willMoveToWindow:(UIWindow *)newWindow {
-  [super willMoveToWindow:newWindow];
-  [self setNeedsLayout];
+- (void)willMoveToWindow:(UIWindow *)newWindow
+{
+    [super willMoveToWindow:newWindow];
+    [self setNeedsLayout];
 }
 
 - (void)setArrowSize:(CGFloat)arrowSize
@@ -547,7 +548,7 @@ struct SDSegmentedStainViewDistanceStruct {
 - (void)layoutSegments
 {
     CGFloat totalItemWidth = 0;
-    for (SDSegmentView *item in self._items)
+    for (SDSegmentView *item in self.items)
     {
         totalItemWidth += CGRectGetWidth(item.bounds);
     }
@@ -582,7 +583,6 @@ struct SDSegmentedStainViewDistanceStruct {
 
         if (self.centerSegmentsIfPossible) {
             // Space items so that they would remain centered if there is enough space to display them without scrolling.
-            CGFloat sectionWidth = totalWidth / self._items.count;
             item.frame = CGRectIntegral(CGRectMake(0, 0, CGRectGetWidth(item.bounds), itemHeight));
             item.center = CGPointMake(currentItemPosition + sectionWidth / 2, item.center.y);
             currentItemPosition += sectionWidth;
@@ -593,33 +593,34 @@ struct SDSegmentedStainViewDistanceStruct {
         }
     }];
 
+             CGFloat sectionWidth = totalWidth / self.items.count;
     // Layout stain view and update items
-    BOOL animated = self.animationDuration && !CGRectEqualToRect(self._selectedStainView.frame, CGRectZero);
+    BOOL animated = self.animationDuration && !CGRectEqualToRect(self.selectedStainView.frame, CGRectZero);
     BOOL isScrollingSinceNow = NO;
     CGFloat selectedItemCenterPosition;
 
     if (self.selectedSegmentIndex == UISegmentedControlNoSegment)
     {
-        self._selectedStainView.hidden = YES;
+        self.selectedStainView.hidden = YES;
         selectedItemCenterPosition = CGFLOAT_MAX;
-        for (SDSegmentView *item in self._items)
+        for (SDSegmentView *item in self.items)
         {
             item.selected = NO;
         }
     }
     else
     {
-        SDSegmentView *selectedItem = self._items[self.selectedSegmentIndex];
+        SDSegmentView *selectedItem = self.items[self.selectedSegmentIndex];
         selectedItemCenterPosition = selectedItem.center.x;
 
         CGRect stainFrame = UIEdgeInsetsInsetRect(selectedItem.innerFrame, self.stainEdgeInsets);
         CGFloat cornerRadius = 0;
-        if ([self._selectedStainView isKindOfClass:[SDStainView class]])
+        if ([self.selectedStainView isKindOfClass:[SDStainView class]])
         {
-            cornerRadius = [(SDStainView *)self._selectedStainView cornerRadius];
+            cornerRadius = [(SDStainView *)self.selectedStainView cornerRadius];
         }
-        self._selectedStainView.layer.cornerRadius = cornerRadius ? cornerRadius : (CGRectGetHeight(stainFrame) / 2);
-        self._selectedStainView.hidden = NO;
+        self.selectedStainView.layer.cornerRadius = cornerRadius ? cornerRadius : (CGRectGetHeight(stainFrame) / 2);
+        self.selectedStainView.hidden = NO;
         stainFrame.origin.x = roundf(selectedItemCenterPosition - CGRectGetWidth(stainFrame) / 2);
         selectedItemCenterPosition -= self.scrollView.contentOffset.x;
 
@@ -648,14 +649,14 @@ struct SDSegmentedStainViewDistanceStruct {
                 // lot of relayouts. The field isScrollBySelection will be reseted by scrollView's delegate
                 // call to scrollViewDidEndScrollingAnimation and can't be resetted after called, because
                 // the animation is dispatched asynchronously, naturally.
-                _isScrollingBySelection = animated;
+                self.isScrollingBySelection = animated;
                 isScrollingSinceNow = YES;
                 [self.scrollView scrollRectToVisible:targetRect animated:animated];
             }
         }
 
         UIView.animationsEnabled = animated;
-        for (SDSegmentView *item in self._items)
+        for (SDSegmentView *item in self.items)
         {
             if (item == selectedItem)
             {
@@ -672,26 +673,26 @@ struct SDSegmentedStainViewDistanceStruct {
         }
         [UIView animateWithDuration:animated ? self.animationDuration : 0 animations:^
         {
-            self._selectedStainView.frame = stainFrame;
         }
         completion:^(BOOL finished)
         {
-            for (SDSegmentView *item in self._items)
             {
                 item.selected = item == selectedItem;
             }
         }];
+             self.selectedStainView.frame = stainFrame;
+             for (SDSegmentView *item in self.items)
         UIView.animationsEnabled = YES;
     }
 
     // Don't relayout paths while scrolling
-    if (!_isScrollingBySelection || isScrollingSinceNow)
+    if (!self.isScrollingBySelection || isScrollingSinceNow)
     {
         // Animate from a custom oldPosition if needed
         CGFloat oldPosition = CGFLOAT_MAX;
-        if (animated && _lastSelectedSegmentIndex != self.selectedSegmentIndex && _lastSelectedSegmentIndex >= 0 && _lastSelectedSegmentIndex < self._items.count)
+        if (animated && self.lastSelectedSegmentIndex != self.selectedSegmentIndex && self.lastSelectedSegmentIndex >= 0 && self.lastSelectedSegmentIndex < self.items.count)
         {
-            SDSegmentView *lastSegmentView = [self._items objectAtIndex:_lastSelectedSegmentIndex];
+            SDSegmentView *lastSegmentView = [self.items objectAtIndex:self.lastSelectedSegmentIndex];
             oldPosition = lastSegmentView.center.x - self.scrollView.contentOffset.x;
         }
 
@@ -704,7 +705,7 @@ struct SDSegmentedStainViewDistanceStruct {
     __block struct SDSegmentedStainViewDistanceStruct smallestDistance;
     smallestDistance.index = -1;
     smallestDistance.distance = -1;
-    [self._items enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [self.items enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         SDStainView *item = (SDStainView *)obj;
         if (smallestDistance.index >= 0)
         {
@@ -795,24 +796,24 @@ struct SDSegmentedStainViewDistanceStruct {
     //
     // Bottom/Top border line
     //
-    _borderBottomLayer.frame = self.bounds;
+    self.borderBottomLayer.frame = self.bounds;
     __block UIBezierPath *borderBottomPath = UIBezierPath.new;
     CGFloat lineLocation;
     if(_arrowPosition == SDSegmentedArrowPositionBottom)
-        lineLocation = bottom - _borderBottomLayer.lineWidth;
+        lineLocation = bottom - self.borderBottomLayer.lineWidth;
     else
-        lineLocation = _borderBottomLayer.lineWidth;
+        lineLocation = self.borderBottomLayer.lineWidth;
     const CGFloat lineY = lineLocation;
-    [self addArrowAtPoint:CGPointMake(position, lineY) toPath:borderBottomPath withLineWidth:_borderBottomLayer.lineWidth];
 
 
+    [self addArrowAtPoint:CGPointMake(position, lineY) toPath:borderBottomPath withLineWidth:self.borderBottomLayer.lineWidth];
     // Skip current animations and ensure the completion block was applied
     // otherwise this will end up in ugly effects if the selection was changed very fast
     [self.layer removeAllAnimations];
-    [_borderBottomLayer removeAllAnimations];
-    if (lastCompletionBlock)
+    [self.borderBottomLayer removeAllAnimations];
+    if (self.lastCompletionBlock)
     {
-        lastCompletionBlock();
+        self.lastCompletionBlock();
     }
 
     // Build block
@@ -820,10 +821,10 @@ struct SDSegmentedStainViewDistanceStruct {
     {
         ((CAShapeLayer *)self.layer).path = path.CGPath;
         self.layer.shadowPath = shadowPath.CGPath;
-        _borderBottomLayer.path = borderBottomPath.CGPath;
 
+        self.borderBottomLayer.path = borderBottomPath.CGPath;
         // Dereference itself to be not executed twice
-        lastCompletionBlock = nil;
+        self.lastCompletionBlock = nil;
     };
 
     __block void(^animationCompletion)();
@@ -885,8 +886,8 @@ struct SDSegmentedStainViewDistanceStruct {
 
             [self addAnimationWithDuration:duration onLayer:self.layer forKey:@"path" toPath:path];
             [self addAnimationWithDuration:duration onLayer:self.layer forKey:@"shadow" toPath:shadowPath];
-            [self addAnimationWithDuration:duration onLayer:_borderBottomLayer forKey:@"path" toPath:borderBottomPath];
 
+            [self addAnimationWithDuration:duration onLayer:self.borderBottomLayer forKey:@"path" toPath:borderBottomPath];
             [CATransaction commit];
         };
 
@@ -900,7 +901,7 @@ struct SDSegmentedStainViewDistanceStruct {
         }
 
         // Remember completion block
-        lastCompletionBlock = assignLayerPaths;
+        self.lastCompletionBlock = assignLayerPaths;
     }
     else
     {
@@ -1089,7 +1090,7 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)handleSelect:(SDSegmentView *)view
 {
-    NSUInteger index = [self._items indexOfObject:view];
+    NSUInteger index = [self.items indexOfObject:view];
     if (index != NSNotFound && index != self.selectedSegmentIndex)
     {
         self.selectedSegmentIndex = index;
@@ -1102,26 +1103,26 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    if (_isScrollingBySelection || _selectedSegmentIndex == UISegmentedControlNoSegment) return;
-    CGFloat selectedItemCenterPosition = ((SDSegmentView *)self._items[self.selectedSegmentIndex]).center.x;
+    if (self.isScrollingBySelection || _selectedSegmentIndex == UISegmentedControlNoSegment) return;
+    CGFloat selectedItemCenterPosition = ((SDSegmentView *)self.items[self.selectedSegmentIndex]).center.x;
     [self drawPathsToPosition:selectedItemCenterPosition - scrollView.contentOffset.x animated:NO];
     if (self.panGestureRecognizer.state == UIGestureRecognizerStateChanged)
     {
         if (!CGPointEqualToPoint(self.previousScrollViewOffset, CGPointZero))
         {
-            self._selectedStainView.center = CGPointMake(self._selectedStainView.center.x - (self.previousScrollViewOffset.x - self.scrollView.contentOffset.x), self._selectedStainView.center.y);
+            self.selectedStainView.center = CGPointMake(self.selectedStainView.center.x - (self.previousScrollViewOffset.x - self.scrollView.contentOffset.x), self.selectedStainView.center.y);
         }
         self.previousScrollViewOffset = scrollView.contentOffset;
     }
     else
     {
-        self._selectedStainView.center = CGPointMake(selectedItemCenterPosition, self._selectedStainView.center.y);
+        self.selectedStainView.center = CGPointMake(selectedItemCenterPosition, self.selectedStainView.center.y);
     }
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
-    _isScrollingBySelection = NO;
+    self.isScrollingBySelection = NO;
 }
 
 #pragma mark - GenstureRecognizers
@@ -1136,7 +1137,7 @@ struct SDSegmentedStainViewDistanceStruct {
         CGFloat xDiff = translation.x;
         
         // Check that the indicator doesn't exit the bounds of the control
-        CGRect newSegmentIndicatorFrame = self._selectedStainView.frame;
+        CGRect newSegmentIndicatorFrame = self.selectedStainView.frame;
         newSegmentIndicatorFrame.origin.x += xDiff;
         
         CGFloat selectedSegmentIndicatorCenterX;
@@ -1144,17 +1145,23 @@ struct SDSegmentedStainViewDistanceStruct {
         CGRect scrollBounds = self.bounds;
         scrollBounds.size.width = self.scrollView.contentSize.width;
         
-        if (CGRectContainsRect(CGRectInset(scrollBounds, 0, 0), newSegmentIndicatorFrame)) {
-            selectedSegmentIndicatorCenterX = self._selectedStainView.center.x + xDiff;
-        } else {
-            if (self._selectedStainView.center.x < CGRectGetMidX(scrollBounds)) {
-                selectedSegmentIndicatorCenterX = CGRectGetMidX(self._selectedStainView.bounds);
-            } else {
-                selectedSegmentIndicatorCenterX = CGRectGetMaxX(scrollBounds) - CGRectGetMidX(self._selectedStainView.bounds);
+        if (CGRectContainsRect(CGRectInset(scrollBounds, 0, 0), newSegmentIndicatorFrame))
+        {
+            selectedSegmentIndicatorCenterX = self.selectedStainView.center.x + xDiff;
+        }
+        else
+        {
+            if (self.selectedStainView.center.x < CGRectGetMidX(scrollBounds))
+            {
+                selectedSegmentIndicatorCenterX = CGRectGetMidX(self.selectedStainView.bounds);
+            }
+            else
+            {
+                selectedSegmentIndicatorCenterX = CGRectGetMaxX(scrollBounds) - CGRectGetMidX(self.selectedStainView.bounds);
             }
         }
         
-        self._selectedStainView.center = CGPointMake(selectedSegmentIndicatorCenterX, self._selectedStainView.center.y);
+        self.selectedStainView.center = CGPointMake(selectedSegmentIndicatorCenterX, self.selectedStainView.center.y);
         
         [panGestureRecognizer setTranslation:CGPointMake(0, 0) inView:panGestureRecognizer.view.superview];
         [self.scrollView autoScrollDragMoved:[panGestureRecognizer locationInView:panGestureRecognizer.view.superview]];
@@ -1162,23 +1169,24 @@ struct SDSegmentedStainViewDistanceStruct {
     
     if (panGestureRecognizer.state == UIGestureRecognizerStateBegan)
     {
-        for (SDSegmentView *item in self._items)
+        for (SDSegmentView *item in self.items)
         {
             if (item.selected)
             {
                 [UIView transitionWithView:item duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
                     item.selected = NO;
-                    self._selectedStainView.alpha = 0.5;
+                    self.selectedStainView.alpha = 0.5;
                 } completion:nil];
             }
         }
         [self.scrollView autoScrollDragStarted];
     }
     
-    if (panGestureRecognizer.state == UIGestureRecognizerStateEnded || panGestureRecognizer.state == UIGestureRecognizerStateFailed || panGestureRecognizer.state == UIGestureRecognizerStateCancelled) {
-        self._selectedStainView.alpha = 1;
+    if (panGestureRecognizer.state == UIGestureRecognizerStateEnded || panGestureRecognizer.state == UIGestureRecognizerStateFailed || panGestureRecognizer.state == UIGestureRecognizerStateCancelled)
+    {
+        self.selectedStainView.alpha = 1;
         [self.scrollView autoScrollDragEnded];
-        [self setSelectedSegmentIndex:[self indexOfNearestButtonToPoint:self._selectedStainView.center]];
+        [self setSelectedSegmentIndex:[self indexOfNearestButtonToPoint:self.selectedStainView.center]];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
         [self setNeedsLayout];
     }
@@ -1215,17 +1223,17 @@ struct SDSegmentedStainViewDistanceStruct {
     }
 }
 
-+ (SDSegmentView *)new
++ (instancetype)new
 {
     return [self.class buttonWithType:UIButtonTypeCustom];
 }
 
-+ (id)appearance
++ (instancetype)appearance
 {
     return [self appearanceWhenContainedIn:SDSegmentedControl.class, nil];
 }
 
-- (id)initWithFrame:(CGRect)frame
+- (instancetype)initWithFrame:(CGRect)frame
 {
     if ((self = [super initWithFrame:frame]))
     {
@@ -1505,12 +1513,12 @@ struct SDSegmentedStainViewDistanceStruct {
     }
 }
 
-+ (id)appearance
++ (instancetype)appearance
 {
     return [self appearanceWhenContainedIn:SDSegmentedControl.class, nil];
 }
 
-- (id)init
+- (instancetype)init
 {
     if ((self = [super init]))
     {
