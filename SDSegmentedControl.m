@@ -234,13 +234,13 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)setTitleFont:(UIFont *)titleFont
 {
-  _titleFont = titleFont;
-  
-  {
-    segmentView.titleFont = titleFont;
-  }
+    _titleFont = titleFont;
+    
     for (int i = 0; i < self.items.count; i++)
+    {
         SDSegmentView *segmentView = (SDSegmentView *)self.items[i];
+        segmentView.titleFont = titleFont;
+    }
 }
 
 - (void)setSelectedTitleFont:(UIFont *)selectedTitleFont
@@ -577,7 +577,6 @@ struct SDSegmentedStainViewDistanceStruct {
     CGFloat itemHeight = self.scrollView.contentSize.height - self.arrowSize / 2 + .5;
 
     currentItemPosition += spaceLeft / 2;
-    [self._items enumerateObjectsUsingBlock:^(SDSegmentView *item, NSUInteger idx, BOOL *stop)
     {
         item.alpha = 1;
 
@@ -593,6 +592,7 @@ struct SDSegmentedStainViewDistanceStruct {
         }
     }];
 
+    [self.items enumerateObjectsUsingBlock:^(SDSegmentView *item, NSUInteger idx, BOOL *stop)
              CGFloat sectionWidth = totalWidth / self.items.count;
     // Layout stain view and update items
     BOOL animated = self.animationDuration && !CGRectEqualToRect(self.selectedStainView.frame, CGRectZero);
