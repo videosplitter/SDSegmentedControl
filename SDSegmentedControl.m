@@ -19,10 +19,11 @@
 const NSTimeInterval kSDSegmentedControlDefaultDuration = 0.2;
 const CGFloat kSDSegmentedControlArrowSize = 6.5;
 const CGFloat kSDSegmentedControlInterItemSpace = 30.0;
-const UIEdgeInsets kSDSegmentedControlStainEdgeInsets = {-2, -16, -4, -16};
+const UIEdgeInsets kSDSegmentedControlStainEdgeInsets = {-2, -14, -4, -14};
 const CGSize kSDSegmentedControlImageSize = {18, 18};
 
 const CGFloat kSDSegmentedControlScrollOffset = 20;
+const CGFloat kSDSegmentViewIsNewCircleDiameter = 6;
 
 struct SDSegmentedStainViewDistanceStruct {
     NSInteger index;
@@ -409,6 +410,20 @@ struct SDSegmentedStainViewDistanceStruct {
 - (CGFloat)widthForSegmentAtIndex:(NSUInteger)index
 {
     return CGRectGetWidth([self segmentAtIndex:index].frame);
+}
+
+#pragma mark - Public
+
+- (void)insertIsNewAtSegmentIndex:(NSInteger)index
+{
+    SDSegmentView *segmentView = self._items[index];
+    segmentView.isNew = YES;
+}
+
+- (void)removeIsNewAtSegmentIndex:(NSInteger)index
+{
+    SDSegmentView *segmentView = self._items[index];
+    segmentView.isNew = NO;
 }
 
 # pragma mark - Private
@@ -1164,6 +1179,7 @@ struct SDSegmentedStainViewDistanceStruct {
         self._selectedStainView.alpha = 1;
         [self.scrollView autoScrollDragEnded];
         [self setSelectedSegmentIndex:[self indexOfNearestButtonToPoint:self._selectedStainView.center]];
+        [self sendActionsForControlEvents:UIControlEventValueChanged];
         [self setNeedsLayout];
     }
 }
@@ -1175,6 +1191,7 @@ struct SDSegmentedStainViewDistanceStruct {
 @property (nonatomic, strong) UIColor *titleColorNormal;
 @property (nonatomic, strong) UIColor *titleColorSelected;
 @property (nonatomic, strong) UIColor *titleColorDisabled;
+@property (nonatomic, strong) UIView *isNewCircleView;
 
 @end
 
@@ -1188,7 +1205,8 @@ struct SDSegmentedStainViewDistanceStruct {
     [appearance setTitleColor:[UIColor colorWithWhite:0.392 alpha:1] forState:UIControlStateNormal];
     [appearance setTitleColor:[UIColor colorWithWhite:0.235 alpha:1] forState:UIControlStateSelected];
     [appearance setTitleColor:[UIColor colorWithWhite:0.800 alpha:1] forState:UIControlStateDisabled];
-
+    [appearance setIsNewCircleColor:[UIColor orangeColor]];
+    
     if (!SD_IS_IOS7)
     {
         [appearance setTitleShadowColor:UIColor.whiteColor forState:UIControlStateNormal];
@@ -1264,11 +1282,19 @@ struct SDSegmentedStainViewDistanceStruct {
     [super setSelected:selected];
     if (selected)
     {
+        if (self.isNewCircleView != nil)
+        {
+            self.isNewCircleView.hidden = YES;
+        }
         self.userInteractionEnabled = NO;
         self.titleLabel.font = self.selectedTitleFont ?: self.titleFont;
     }
     else
     {
+        if (self.isNewCircleView != nil)
+        {
+            self.isNewCircleView.hidden = NO;
+        }
         self.userInteractionEnabled = YES;
         self.titleLabel.font = self.titleFont;
     }
@@ -1386,6 +1412,71 @@ struct SDSegmentedStainViewDistanceStruct {
 - (void)setHighlighted:(BOOL)highlighted
 {
     return;
+}
+
+- (void)setIsNewCircleColor:(UIColor *)isNewCircleColor
+{
+    _isNewCircleColor = isNewCircleColor;
+    if (isNewCircleColor != nil)
+    {
+        self.isNewCircleView.backgroundColor = isNewCircleColor;
+    }
+}
+
+- (void)setIsNew:(BOOL)isNew
+{
+    _isNew = isNew;
+    if (isNew)
+    {
+        if (self.isNewCircleView == nil)
+        {
+            self.isNewCircleView = [[UIView alloc] init];
+            self.isNewCircleView.translatesAutoresizingMaskIntoConstraints = NO;
+            [self addSubview:self.isNewCircleView];
+            self.isNewCircleView.backgroundColor = self.isNewCircleColor;
+            self.isNewCircleView.layer.cornerRadius = kSDSegmentViewIsNewCircleDiameter / 2;
+            [self.isNewCircleView addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                                             attribute:NSLayoutAttributeWidth
+                                                                             relatedBy:NSLayoutRelationEqual
+                                                                                toItem:nil
+                                                                             attribute:NSLayoutAttributeWidth
+                                                                            multiplier:1.f
+                                                                              constant:kSDSegmentViewIsNewCircleDiameter]];
+            
+            [self.isNewCircleView addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                                             attribute:NSLayoutAttributeHeight
+                                                                             relatedBy:NSLayoutRelationEqual
+                                                                                toItem:nil attribute:NSLayoutAttributeHeight
+                                                                            multiplier:1.f
+                                                                              constant:kSDSegmentViewIsNewCircleDiameter]];
+            
+            [self addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                             attribute:NSLayoutAttributeTrailing
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:self
+                                                             attribute:NSLayoutAttributeTrailing
+                                                            multiplier:1.f
+                                                              constant:3]];
+            
+            [self addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                             attribute:NSLayoutAttributeTop
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:self.titleLabel
+                                                             attribute:NSLayoutAttributeTop
+                                                            multiplier:1.f
+                                                              constant:0]];
+            
+            if (self.selected)
+            {
+                self.isNewCircleView.hidden = YES;
+            }
+        }
+    }
+    else
+    {
+        [self.isNewCircleView removeFromSuperview];
+        self.isNewCircleView = nil;
+    }
 }
 
 @end

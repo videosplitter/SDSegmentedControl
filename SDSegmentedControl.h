@@ -39,6 +39,8 @@ typedef enum {
 @property (assign, nonatomic) BOOL centerSegmentsIfPossible UI_APPEARANCE_SELECTOR;
 
 @property (assign,nonatomic) UIScrollView *scrollView;
+- (void)insertIsNewAtSegmentIndex:(NSInteger)index;
+- (void)removeIsNewAtSegmentIndex:(NSInteger)index;
 
 @end
 
@@ -48,6 +50,8 @@ typedef enum {
 @property (retain, nonatomic) UIFont *titleFont;
 @property (retain, nonatomic) UIFont *selectedTitleFont;
 @property (assign, nonatomic) CGSize titleShadowOffset UI_APPEARANCE_SELECTOR;
+@property (retain, nonatomic) UIColor *isNewCircleColor UI_APPEARANCE_SELECTOR;
+@property (assign, nonatomic) BOOL isNew;
 
 @end
 
