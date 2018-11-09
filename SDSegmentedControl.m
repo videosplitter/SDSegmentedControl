@@ -245,13 +245,13 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)setSelectedTitleFont:(UIFont *)selectedTitleFont
 {
-  _selectedTitleFont = selectedTitleFont;
-  
-  {
-    segmentView.selectedTitleFont = selectedTitleFont;
-  }
+    _selectedTitleFont = selectedTitleFont;
+    
     for (int i = 0; i < self.items.count; i++)
+    {
         SDSegmentView *segmentView = (SDSegmentView *)self.items[i];
+        segmentView.selectedTitleFont = selectedTitleFont;
+    }
 }
 
 
@@ -577,23 +577,23 @@ struct SDSegmentedStainViewDistanceStruct {
     CGFloat itemHeight = self.scrollView.contentSize.height - self.arrowSize / 2 + .5;
 
     currentItemPosition += spaceLeft / 2;
-    {
-        item.alpha = 1;
-
-        if (self.centerSegmentsIfPossible) {
-            // Space items so that they would remain centered if there is enough space to display them without scrolling.
-            item.frame = CGRectIntegral(CGRectMake(0, 0, CGRectGetWidth(item.bounds), itemHeight));
-            item.center = CGPointMake(currentItemPosition + sectionWidth / 2, item.center.y);
-            currentItemPosition += sectionWidth;
-        }
-        else {
-            item.frame = CGRectIntegral(CGRectMake(currentItemPosition, 0, CGRectGetWidth(item.bounds), itemHeight));
-            currentItemPosition = CGRectGetMaxX(item.frame) + self.interItemSpace;
-        }
-    }];
-
     [self.items enumerateObjectsUsingBlock:^(SDSegmentView *item, NSUInteger idx, BOOL *stop)
+     {
+         item.alpha = 1;
+         
+         if (self.centerSegmentsIfPossible) {
+             // Space items so that they would remain centered if there is enough space to display them without scrolling.
              CGFloat sectionWidth = totalWidth / self.items.count;
+             item.frame = CGRectIntegral(CGRectMake(0, 0, CGRectGetWidth(item.bounds), itemHeight));
+             item.center = CGPointMake(currentItemPosition + sectionWidth / 2, item.center.y);
+             currentItemPosition += sectionWidth;
+         }
+         else {
+             item.frame = CGRectIntegral(CGRectMake(currentItemPosition, 0, CGRectGetWidth(item.bounds), itemHeight));
+             currentItemPosition = CGRectGetMaxX(item.frame) + self.interItemSpace;
+         }
+     }];
+    
     // Layout stain view and update items
     BOOL animated = self.animationDuration && !CGRectEqualToRect(self.selectedStainView.frame, CGRectZero);
     BOOL isScrollingSinceNow = NO;
