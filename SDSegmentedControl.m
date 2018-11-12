@@ -1444,11 +1444,17 @@ struct SDSegmentedStainViewDistanceStruct {
                 self.isNewCircleView.hidden = YES;
             }
         }
+        else
+        {
+            self.isNewCircleView.hidden = NO;
+        }
     }
     else
     {
-        [self.isNewCircleView removeFromSuperview];
-        self.isNewCircleView = nil;
+        if (self.isNewCircleView != nil)
+        {
+            self.isNewCircleView.hidden = YES;
+        }
     }
 }
 
