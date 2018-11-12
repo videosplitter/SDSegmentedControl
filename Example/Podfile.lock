@@ -17,7 +17,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   SDSegmentedControl:
-    :commit: 6413f842c71f81b6cb3fa0299765cc0764c11c12
+    :commit: f21016748641d1e0083d1d04051e1f95578b4fa1
     :git: https://github.com/d1astola/SDSegmentedControl
 
 SPEC CHECKSUMS:
