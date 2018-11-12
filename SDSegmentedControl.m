@@ -399,14 +399,20 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)insertIsNewAtSegmentIndex:(NSInteger)index
 {
-    SDSegmentView *segmentView = self.items[index];
-    segmentView.isNew = YES;
+    if (index < self.items.count)
+    {
+        SDSegmentView *segmentView = self.items[index];
+        segmentView.isNew = YES;
+    }
 }
 
 - (void)removeIsNewAtSegmentIndex:(NSInteger)index
 {
-    SDSegmentView *segmentView = self.items[index];
-    segmentView.isNew = NO;
+    if (index < self.items.count)
+    {
+        SDSegmentView *segmentView = self.items[index];
+        segmentView.isNew = NO;
+    }
 }
 
 # pragma mark - Private
