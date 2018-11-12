@@ -402,20 +402,12 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)insertIsNewAtSegmentIndex:(NSInteger)index
 {
-    if (index < self.items.count)
-    {
-        SDSegmentView *segmentView = self.items[index];
-        segmentView.isNew = YES;
-    }
+    [self segmentAtIndex:index].isNew = YES;
 }
 
 - (void)removeIsNewAtSegmentIndex:(NSInteger)index
 {
-    if (index < self.items.count)
-    {
-        SDSegmentView *segmentView = self.items[index];
-        segmentView.isNew = NO;
-    }
+    [self segmentAtIndex:index].isNew = NO;
 }
 
 # pragma mark - Private
@@ -488,12 +480,16 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (SDSegmentView *)segmentAtIndex:(NSUInteger)index
 {
-    NSParameterAssert(index >= 0 && index < self.items.count);
-    return self.items[index];
+    if (index < self.items.count)
+    {
+        return self.items[index];
+    }
+    return nil;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview
 {
+    [super willMoveToSuperview:newSuperview];
     CGRect frame = self.frame;
     if (frame.size.height == 0)
     {
