@@ -137,7 +137,8 @@ struct SDSegmentedStainViewDistanceStruct {
     self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.showsVerticalScrollIndicator = NO;
     // Init stain view
-    [self.scrollView addSubview:self.selectedStainView = SDStainView.new];
+    self.selectedStainView = [SDStainView new];
+    [self.scrollView addSubview:self.selectedStainView];
     
     // Init pan gesture
     self.panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureRecognized:)];
