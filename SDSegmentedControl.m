@@ -112,7 +112,8 @@ struct SDSegmentedStainViewDistanceStruct {
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
     // Reset UIKit original widget
-    for (UIView *subview in self.subviews)
+    NSArray<UIView *> *subviews = self.subviews.copy;
+    for (UIView *subview in subviews)
     {
         [subview removeFromSuperview];
     }
