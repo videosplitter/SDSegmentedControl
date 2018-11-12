@@ -1246,6 +1246,54 @@ struct SDSegmentedStainViewDistanceStruct {
     return self;
 }
 
+- (void)didMoveToSuperview
+{
+    [super didMoveToSuperview];
+    self.isNewCircleView = [[UIView alloc] init];
+    self.isNewCircleView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:self.isNewCircleView];
+    self.isNewCircleView.backgroundColor = self.isNewCircleColor;
+    self.isNewCircleView.layer.cornerRadius = self.isNewCircleDiameter / 2;
+    
+    self.isNewCircleViewDiameterConstraint = [NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                                          attribute:NSLayoutAttributeWidth
+                                                                          relatedBy:NSLayoutRelationEqual
+                                                                             toItem:nil
+                                                                          attribute:NSLayoutAttributeWidth
+                                                                         multiplier:1.f
+                                                                           constant:self.isNewCircleDiameter];
+    
+    [self.isNewCircleView addConstraint:self.isNewCircleViewDiameterConstraint];
+    
+    [self.isNewCircleView addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                                     attribute:NSLayoutAttributeHeight
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.isNewCircleView
+                                                                     attribute:NSLayoutAttributeWidth
+                                                                    multiplier:1.f
+                                                                      constant:0]];
+    
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                     attribute:NSLayoutAttributeLeading
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self.titleLabel
+                                                     attribute:NSLayoutAttributeTrailing
+                                                    multiplier:1.f
+                                                      constant:0]];
+    
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                     attribute:NSLayoutAttributeTop
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self.titleLabel
+                                                     attribute:NSLayoutAttributeTop
+                                                    multiplier:1.f
+                                                      constant:0]];
+    if (self.selected || !self.isNew)
+    {
+        self.isNewCircleView.hidden = YES;
+    }
+}
+
 - (void)setTitleFont:(UIFont *)titleFont
 {
     _titleFont = titleFont;
@@ -1319,9 +1367,8 @@ struct SDSegmentedStainViewDistanceStruct {
         image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
     }
-
-	return image;
-
+    
+    return image;
 }
 
 - (CGRect)innerFrame
@@ -1420,71 +1467,11 @@ struct SDSegmentedStainViewDistanceStruct {
     _isNew = isNew;
     if (isNew)
     {
-        if (self.isNewCircleView == nil)
-        {
-            self.isNewCircleView = [[UIView alloc] init];
-            self.isNewCircleView.translatesAutoresizingMaskIntoConstraints = NO;
-            [self addSubview:self.isNewCircleView];
-            self.isNewCircleView.backgroundColor = self.isNewCircleColor;
-            self.isNewCircleView.layer.cornerRadius = self.isNewCircleDiameter / 2;
-            
-            self.isNewCircleViewDiameterConstraint = [NSLayoutConstraint constraintWithItem:self.isNewCircleView
-                                                                                  attribute:NSLayoutAttributeWidth
-                                                                                  relatedBy:NSLayoutRelationEqual
-                                                                                     toItem:nil
-                                                                                  attribute:NSLayoutAttributeWidth
-                                                                                 multiplier:1.f
-                                                                                   constant:self.isNewCircleDiameter];
-            
-            [self.isNewCircleView addConstraint:self.isNewCircleViewDiameterConstraint];
-            
-            [self.isNewCircleView addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
-                                                                             attribute:NSLayoutAttributeHeight
-                                                                             relatedBy:NSLayoutRelationEqual
-                                                                                toItem:self.isNewCircleView
-                                                                             attribute:NSLayoutAttributeWidth
-                                                                            multiplier:1.f
-                                                                              constant:0]];
-            
-            [self addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
-                                                             attribute:NSLayoutAttributeTrailing
-                                                             relatedBy:NSLayoutRelationEqual
-                                                                toItem:self
-                                                             attribute:NSLayoutAttributeTrailing
-                                                            multiplier:1.f
-                                                              constant:3]];
-            
-            [self addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
-                                                             attribute:NSLayoutAttributeTop
-                                                             relatedBy:NSLayoutRelationEqual
-                                                                toItem:self.titleLabel
-                                                             attribute:NSLayoutAttributeTop
-                                                            multiplier:1.f
-                                                              constant:0]];
-            
-            if (self.selected)
-            {
-                self.isNewCircleView.hidden = YES;
-            }
-        }
-        else
-        {
-            if (self.selected)
-            {
-                self.isNewCircleView.hidden = YES;
-            }
-            else
-            {
-                self.isNewCircleView.hidden = NO;
-            }
-        }
+        self.isNewCircleView.hidden = self.selected;
     }
     else
     {
-        if (self.isNewCircleView != nil)
-        {
-            self.isNewCircleView.hidden = YES;
-        }
+        self.isNewCircleView.hidden = YES;
     }
 }
 
