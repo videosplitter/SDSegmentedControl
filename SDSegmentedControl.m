@@ -106,7 +106,8 @@ struct SDSegmentedStainViewDistanceStruct {
 
     _items = NSMutableArray.new;
     // Appearance properties
-    _animationDuration = kSDSegmentedControlDefaultDuration;
+    self.animationDuration = kSDSegmentedControlDefaultDuration;
+    self.insertionRemovingAnimationDuration = kSDSegmentedControlInsertionRemovingDuration;
     _arrowSize = kSDSegmentedControlArrowSize;
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
@@ -136,6 +137,7 @@ struct SDSegmentedStainViewDistanceStruct {
     self.scrollView.backgroundColor = UIColor.clearColor;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.showsVerticalScrollIndicator = NO;
+    self.scrollOffset = kSDSegmentedControlScrollOffset;
     // Init stain view
     self.selectedStainView = [SDStainView new];
     [self.scrollView addSubview:self.selectedStainView];
@@ -318,7 +320,7 @@ struct SDSegmentedStainViewDistanceStruct {
 
     if (animated)
     {
-        [UIView animateWithDuration:kSDSegmentedControlInsertionRemovingDuration animations:^
+        [UIView animateWithDuration:self.insertionRemovingAnimationDuration animations:^
         {
             segmentView.alpha = 0;
             [self layoutSegments];
@@ -451,7 +453,7 @@ struct SDSegmentedStainViewDistanceStruct {
     self.lastSelectedSegmentIndex = self.selectedSegmentIndex;
     if (animated)
     {
-        [UIView animateWithDuration:kSDSegmentedControlInsertionRemovingDuration animations:^
+        [UIView animateWithDuration:self.insertionRemovingAnimationDuration animations:^
          {
              [self layoutSegments];
          }];
@@ -551,8 +553,8 @@ struct SDSegmentedStainViewDistanceStruct {
     if (totalWidth > self.bounds.size.width)
     {
         // We must scroll, so add an offset
-        totalWidth += 2 * kSDSegmentedControlScrollOffset;
-        currentItemPosition += kSDSegmentedControlScrollOffset;
+        totalWidth += 2 * self.scrollOffset;
+        currentItemPosition += self.scrollOffset;
         contentSize.width = totalWidth;
     }
     else
@@ -617,8 +619,8 @@ struct SDSegmentedStainViewDistanceStruct {
         if (self.scrollView.contentSize.width > self.scrollView.bounds.size.width)
         {
             CGRect scrollRect = {self.scrollView.contentOffset, self.scrollView.bounds.size};
-            CGRect targetRect = CGRectInset(stainFrame, -kSDSegmentedControlScrollOffset / 2, 0);
-
+            CGRect targetRect = CGRectInset(stainFrame, -self.scrollOffset / 2, 0);
+            
             if (!CGRectContainsRect(scrollRect, targetRect))
             {
                 // Adjust position
@@ -1191,6 +1193,7 @@ struct SDSegmentedStainViewDistanceStruct {
 @property (nonatomic, strong) UIColor *titleColorSelected;
 @property (nonatomic, strong) UIColor *titleColorDisabled;
 @property (nonatomic, strong) UIView *isNewCircleView;
+@property (nonatomic, strong) NSLayoutConstraint *isNewCircleViewDiameterConstraint;
 
 @end
 
@@ -1205,6 +1208,7 @@ struct SDSegmentedStainViewDistanceStruct {
     [appearance setTitleColor:[UIColor colorWithWhite:0.235 alpha:1] forState:UIControlStateSelected];
     [appearance setTitleColor:[UIColor colorWithWhite:0.800 alpha:1] forState:UIControlStateDisabled];
     [appearance setIsNewCircleColor:[UIColor orangeColor]];
+    [appearance setIsNewCircleDiameter:kSDSegmentViewIsNewCircleDiameter];
 }
 
 + (instancetype)new
@@ -1404,6 +1408,13 @@ struct SDSegmentedStainViewDistanceStruct {
     }
 }
 
+- (void)setIsNewCircleDiameter:(NSInteger)isNewCircleDiameter
+{
+    _isNewCircleDiameter = isNewCircleDiameter;
+    self.isNewCircleViewDiameterConstraint.constant = isNewCircleDiameter;
+    self.isNewCircleView.layer.cornerRadius = isNewCircleDiameter / 2;
+}
+
 - (void)setIsNew:(BOOL)isNew
 {
     _isNew = isNew;
@@ -1415,21 +1426,25 @@ struct SDSegmentedStainViewDistanceStruct {
             self.isNewCircleView.translatesAutoresizingMaskIntoConstraints = NO;
             [self addSubview:self.isNewCircleView];
             self.isNewCircleView.backgroundColor = self.isNewCircleColor;
-            self.isNewCircleView.layer.cornerRadius = kSDSegmentViewIsNewCircleDiameter / 2;
-            [self.isNewCircleView addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
-                                                                             attribute:NSLayoutAttributeWidth
-                                                                             relatedBy:NSLayoutRelationEqual
-                                                                                toItem:nil
-                                                                             attribute:NSLayoutAttributeWidth
-                                                                            multiplier:1.f
-                                                                              constant:kSDSegmentViewIsNewCircleDiameter]];
+            self.isNewCircleView.layer.cornerRadius = self.isNewCircleDiameter / 2;
+            
+            self.isNewCircleViewDiameterConstraint = [NSLayoutConstraint constraintWithItem:self.isNewCircleView
+                                                                                  attribute:NSLayoutAttributeWidth
+                                                                                  relatedBy:NSLayoutRelationEqual
+                                                                                     toItem:nil
+                                                                                  attribute:NSLayoutAttributeWidth
+                                                                                 multiplier:1.f
+                                                                                   constant:self.isNewCircleDiameter];
+            
+            [self.isNewCircleView addConstraint:self.isNewCircleViewDiameterConstraint];
             
             [self.isNewCircleView addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
                                                                              attribute:NSLayoutAttributeHeight
                                                                              relatedBy:NSLayoutRelationEqual
-                                                                                toItem:nil attribute:NSLayoutAttributeHeight
+                                                                                toItem:self.isNewCircleView
+                                                                             attribute:NSLayoutAttributeWidth
                                                                             multiplier:1.f
-                                                                              constant:kSDSegmentViewIsNewCircleDiameter]];
+                                                                              constant:0]];
             
             [self addConstraint:[NSLayoutConstraint constraintWithItem:self.isNewCircleView
                                                              attribute:NSLayoutAttributeTrailing

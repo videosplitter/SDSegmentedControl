@@ -28,6 +28,7 @@ typedef enum {
 @property (assign, nonatomic) SDSegmentedArrowPosition arrowPosition UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat arrowHeightFactor UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CFTimeInterval animationDuration UI_APPEARANCE_SELECTOR;
+@property (assign, nonatomic) CFTimeInterval insertionRemovingAnimationDuration UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) CGFloat interItemSpace UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) UIEdgeInsets stainEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (strong, nonatomic) UIColor *shadowColor UI_APPEARANCE_SELECTOR;
@@ -37,6 +38,7 @@ typedef enum {
 @property (strong, nonatomic) UIFont *titleFont UI_APPEARANCE_SELECTOR;
 @property (strong, nonatomic) UIFont *selectedTitleFont UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) BOOL centerSegmentsIfPossible UI_APPEARANCE_SELECTOR;
+@property (assign, nonatomic) CGFloat scrollOffset UI_APPEARANCE_SELECTOR;
 - (void)insertIsNewAtSegmentIndex:(NSInteger)index;
 - (void)removeIsNewAtSegmentIndex:(NSInteger)index;
 
@@ -49,6 +51,7 @@ typedef enum {
 @property (strong, nonatomic) UIFont *selectedTitleFont;
 @property (assign, nonatomic) CGSize titleShadowOffset UI_APPEARANCE_SELECTOR;
 @property (strong, nonatomic) UIColor *isNewCircleColor UI_APPEARANCE_SELECTOR;
+@property (assign, nonatomic) NSInteger isNewCircleDiameter UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) BOOL isNew;
 
 @end
