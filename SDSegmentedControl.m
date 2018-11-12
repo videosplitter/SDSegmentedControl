@@ -1258,7 +1258,7 @@ struct SDSegmentedStainViewDistanceStruct {
     [super setSelected:selected];
     if (selected)
     {
-        if (self.isNewCircleView != nil)
+        if (self.isNew)
         {
             self.isNewCircleView.hidden = YES;
         }
@@ -1267,7 +1267,7 @@ struct SDSegmentedStainViewDistanceStruct {
     }
     else
     {
-        if (self.isNewCircleView != nil)
+        if (self.isNew)
         {
             self.isNewCircleView.hidden = NO;
         }
@@ -1439,14 +1439,17 @@ struct SDSegmentedStainViewDistanceStruct {
                                                             multiplier:1.f
                                                               constant:0]];
             
+        }
+        else
+        {
             if (self.selected)
             {
                 self.isNewCircleView.hidden = YES;
             }
-        }
-        else
-        {
-            self.isNewCircleView.hidden = NO;
+            else
+            {
+                self.isNewCircleView.hidden = NO;
+            }
         }
     }
     else
