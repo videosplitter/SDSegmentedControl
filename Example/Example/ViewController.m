@@ -64,4 +64,14 @@
     self.currentTabLabel.text = [NSString stringWithFormat:@"%ld", (long)self.segmentedControl.selectedSegmentIndex];
 }
 
+- (IBAction)insertSegment:(id)sender
+{
+    [self.segmentedControl insertSegmentWithTitle:@"new segment" atIndex:self.segmentedControl.numberOfSegments animated:YES];
+}
+
+- (IBAction)removeSegment:(id)sender
+{
+    [self.segmentedControl removeSegmentAtIndex:self.segmentedControl.numberOfSegments - 1 animated:YES];
+}
+
 @end

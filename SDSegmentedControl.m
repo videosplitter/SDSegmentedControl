@@ -11,6 +11,7 @@
 #pragma mark - Constants
 
 const NSTimeInterval kSDSegmentedControlDefaultDuration = 0.2;
+const NSTimeInterval kSDSegmentedControlInsertionRemovingDuration = 0.4;
 const CGFloat kSDSegmentedControlArrowSize = 6.5;
 const CGFloat kSDSegmentedControlInterItemSpace = 30.0;
 const UIEdgeInsets kSDSegmentedControlStainEdgeInsets = {-2, -14, -4, -14};
@@ -316,7 +317,7 @@ struct SDSegmentedStainViewDistanceStruct {
 
     if (animated)
     {
-        [UIView animateWithDuration:.4 animations:^
+        [UIView animateWithDuration:kSDSegmentedControlInsertionRemovingDuration animations:^
         {
             segmentView.alpha = 0;
             [self layoutSegments];
@@ -443,7 +444,7 @@ struct SDSegmentedStainViewDistanceStruct {
     self.lastSelectedSegmentIndex = self.selectedSegmentIndex;
     if (animated)
     {
-        [UIView animateWithDuration:.4 animations:^
+        [UIView animateWithDuration:kSDSegmentedControlInsertionRemovingDuration animations:^
          {
              [self layoutSegments];
          }];
@@ -1155,7 +1156,7 @@ struct SDSegmentedStainViewDistanceStruct {
         {
             if (item.selected)
             {
-                [UIView transitionWithView:item duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+                [UIView transitionWithView:item duration:self.animationDuration options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
                     item.selected = NO;
                     self.selectedStainView.alpha = 0.5;
                 } completion:nil];

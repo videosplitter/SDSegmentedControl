@@ -60,18 +60,36 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hrd-G3-jDd">
+                    <rect key="frame" x="50" y="197" width="103" height="30"/>
+                    <state key="normal" title="insert segment"/>
+                    <connections>
+                        <action selector="insertSegment:" destination="-1" eventType="touchUpInside" id="OWp-if-nbu"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tGl-DX-Gwp">
+                    <rect key="frame" x="50" y="235" width="115" height="30"/>
+                    <state key="normal" title="remove segment"/>
+                    <connections>
+                        <action selector="removeSegment:" destination="-1" eventType="touchUpInside" id="5cH-r7-AL9"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
+                <constraint firstItem="hrd-G3-jDd" firstAttribute="top" secondItem="XuK-zj-JrP" secondAttribute="bottom" constant="8" id="1vg-2Q-ls2"/>
                 <constraint firstItem="Qfq-Pg-QMo" firstAttribute="top" secondItem="Nd8-io-R5D" secondAttribute="bottom" constant="50" id="3Ec-BJ-kTv"/>
                 <constraint firstItem="XuK-zj-JrP" firstAttribute="top" secondItem="Qfq-Pg-QMo" secondAttribute="bottom" constant="8" id="7ld-Yg-QaB"/>
                 <constraint firstItem="tKm-zv-7HA" firstAttribute="top" secondItem="Nd8-io-R5D" secondAttribute="bottom" constant="20" id="9q4-5A-vcl"/>
+                <constraint firstItem="hrd-G3-jDd" firstAttribute="leading" secondItem="NAE-vn-Co7" secondAttribute="leading" constant="50" id="CWU-o6-e72"/>
                 <constraint firstItem="XuK-zj-JrP" firstAttribute="leading" secondItem="NAE-vn-Co7" secondAttribute="leading" constant="50" id="H79-cC-45H"/>
                 <constraint firstItem="Qfq-Pg-QMo" firstAttribute="leading" secondItem="NAE-vn-Co7" secondAttribute="leading" constant="50" id="XkH-mL-iGL"/>
                 <constraint firstItem="tKm-zv-7HA" firstAttribute="centerX" secondItem="NAE-vn-Co7" secondAttribute="centerX" id="cb6-sg-THL"/>
                 <constraint firstItem="Nd8-io-R5D" firstAttribute="leading" secondItem="6" secondAttribute="leading" id="dCW-Bs-xhX"/>
+                <constraint firstItem="tGl-DX-Gwp" firstAttribute="top" secondItem="hrd-G3-jDd" secondAttribute="bottom" constant="8" id="pyA-bG-k5Y"/>
                 <constraint firstItem="Nd8-io-R5D" firstAttribute="top" secondItem="NAE-vn-Co7" secondAttribute="top" id="qTP-e6-Pva"/>
                 <constraint firstAttribute="trailing" secondItem="Nd8-io-R5D" secondAttribute="trailing" id="s8X-NW-fp3"/>
+                <constraint firstItem="tGl-DX-Gwp" firstAttribute="leading" secondItem="NAE-vn-Co7" secondAttribute="leading" constant="50" id="ufo-FP-BWD"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="NAE-vn-Co7"/>
             <point key="canvasLocation" x="25.5" y="51"/>
