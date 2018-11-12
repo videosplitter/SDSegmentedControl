@@ -340,7 +340,10 @@ struct SDSegmentedStainViewDistanceStruct {
 
 - (void)removeAllSegments
 {
-    [self.items makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    for (SDSegmentView *item in self.items)
+    {
+        [item removeFromSuperview];
+    }
     [self.items removeAllObjects];
     self.selectedSegmentIndex = UISegmentedControlNoSegment;
     [self setNeedsLayout];
