@@ -296,14 +296,14 @@ struct SDSegmentedStainViewDistanceStruct {
         if (self.items.count == 1)
         {
             // Deselect if there is no item
-            self.selectedSegmentIndex = UISegmentedControlNoSegment;
+            self.selectedSegmentIndex = 0;
             changed = YES;
         }
         else if (self.selectedSegmentIndex == index)
         {
             // Inform that the old value doesn't exist anymore
             changed = YES;
-            self.selectedSegmentIndex = [self firstEnabledSegmentIndexNearIndex:self.selectedSegmentIndex];
+            self.selectedSegmentIndex = [self firstEnabledSegmentIndexNearIndex:self.selectedSegmentIndex - 1];
         }
         else if (self.selectedSegmentIndex > index)
         {
@@ -444,6 +444,7 @@ struct SDSegmentedStainViewDistanceStruct {
     if (self.selectedSegmentIndex >= index && self.selectedSegmentIndex + 1 < self.items.count)
     {
         self.selectedSegmentIndex++;
+        [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 
     self.lastSelectedSegmentIndex = self.selectedSegmentIndex;

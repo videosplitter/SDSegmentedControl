@@ -56,8 +56,7 @@
 
 - (IBAction)removeIsNewAction:(id)sender
 {
-//    [self.segmentedControl removeIsNewAtSegmentIndex:3];
-    [self.segmentedControl removeAllSegments];
+    [self.segmentedControl removeIsNewAtSegmentIndex:3];
 }
 
 - (IBAction)segmentedControlTabChanged:(id)sender
