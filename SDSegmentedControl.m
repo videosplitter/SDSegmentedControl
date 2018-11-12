@@ -1440,6 +1440,10 @@ struct SDSegmentedStainViewDistanceStruct {
                                                             multiplier:1.f
                                                               constant:0]];
             
+            if (self.selected)
+            {
+                self.isNewCircleView.hidden = YES;
+            }
         }
         else
         {
