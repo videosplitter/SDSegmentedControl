@@ -110,8 +110,11 @@ struct SDSegmentedStainViewDistanceStruct {
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
     // Reset UIKit original widget
-    [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-
+    for (UIView *subview in self.subviews)
+    {
+        [subview removeFromSuperview];
+    }
+    
     // Init layer
     self.layer.backgroundColor = UIColor.clearColor.CGColor;
     self.backgroundColor = [UIColor clearColor];
