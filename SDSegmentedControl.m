@@ -1284,10 +1284,7 @@ struct SDSegmentedStainViewDistanceStruct {
                                                      attribute:NSLayoutAttributeTop
                                                     multiplier:1.f
                                                       constant:0]];
-    if (self.selected || !self.isNew)
-    {
-        self.isNewCircleView.hidden = YES;
-    }
+    self.isNewCircleView.hidden = self.selected || !self.isNew;
 }
 
 - (void)setTitleFont:(UIFont *)titleFont
