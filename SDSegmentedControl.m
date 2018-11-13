@@ -5,7 +5,7 @@
 //
 
 #import "SDSegmentedControl.h"
-#import <UIScrollView+AtkDragAndDrop.h>
+#import "UIScrollView+AtkDragAndDrop.h"
 #import <QuartzCore/QuartzCore.h>
 
 #pragma mark - Constants
