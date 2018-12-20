@@ -664,9 +664,14 @@ struct SDSegmentedStainViewDistanceStruct {
                 } completion:nil];
             }
         }
+        
+        BOOL frameIsCorrect = selectedItem.innerFrame.size.height != 0 || selectedItem.innerFrame.size.width != 0;
         [UIView animateWithDuration:animated ? self.animationDuration : 0 animations:^
          {
-             self.selectedStainView.frame = stainFrame;
+             if (frameIsCorrect || !CGRectEqualToRect(self.selectedStainView.frame, CGRectZero))
+             {
+                 self.selectedStainView.frame = stainFrame;
+             }
          }
                          completion:^(BOOL finished)
          {
