@@ -1191,6 +1191,18 @@ struct SDSegmentedStainViewDistanceStruct {
     }
 }
 
+#pragma mark Accessibility
+
+- (BOOL)isAccessibilityElement
+{
+    return NO;
+}
+
+- (NSArray *)accessibilityElements
+{
+    return self.items;
+}
+
 @end
 
 @interface SDSegmentView ()
