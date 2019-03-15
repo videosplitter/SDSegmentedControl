@@ -2,5 +2,5 @@ platform :ios, '9.0'
 inhibit_all_warnings!
 
 target 'Example' do
-    pod 'SDSegmentedControl', git:'https://github.com/d1astola/SDSegmentedControl', branch: 'master'
+    pod 'SDSegmentedControl', git:'https://github.com/ReadyMades/SDSegmentedControl', branch: 'master'
 end

@@ -32,6 +32,8 @@
     SDSegmentView *segmenteViewAppearance = SDSegmentView.appearance;
     [segmenteViewAppearance setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [segmenteViewAppearance setTitleColor:[UIColor colorWithRed:0 green:84/255.0 blue:108/255.0 alpha:1.f] forState:UIControlStateSelected];
+    segmenteViewAppearance.isNewCircleColor = [UIColor orangeColor];
+    segmenteViewAppearance.isNewCircleSelectedColor = [UIColor colorWithRed:0 green:84/255.0 blue:108/255.0 alpha:1.f];
     
     SDStainView *stainViewAppearance = SDStainView.appearance;
     stainViewAppearance.backgroundColor = [UIColor whiteColor];

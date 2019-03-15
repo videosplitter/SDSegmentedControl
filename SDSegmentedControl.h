@@ -51,6 +51,7 @@ typedef enum {
 @property (strong, nonatomic) UIFont *selectedTitleFont;
 @property (assign, nonatomic) CGSize titleShadowOffset UI_APPEARANCE_SELECTOR;
 @property (strong, nonatomic) UIColor *isNewCircleColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *isNewCircleSelectedColor UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) NSInteger isNewCircleDiameter UI_APPEARANCE_SELECTOR;
 @property (assign, nonatomic) BOOL isNew;
 
