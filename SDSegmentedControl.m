@@ -1331,24 +1331,9 @@ struct SDSegmentedStainViewDistanceStruct {
 - (void)setSelected:(BOOL)selected
 {
     [super setSelected:selected];
-    if (selected)
-    {
-        if (self.isNew)
-        {
-            self.isNewCircleView.hidden = YES;
-        }
-        self.userInteractionEnabled = NO;
-        self.titleLabel.font = self.selectedTitleFont ?: self.titleFont;
-    }
-    else
-    {
-        if (self.isNew)
-        {
-            self.isNewCircleView.hidden = NO;
-        }
-        self.userInteractionEnabled = YES;
-        self.titleLabel.font = self.titleFont;
-    }
+    [self updateIsNewColor];
+    self.userInteractionEnabled = !selected;
+    self.titleLabel.font = selected ? self.selectedTitleFont ?: self.titleFont : self.titleFont;
 }
 
 - (CGSize)titleShadowOffset
@@ -1464,10 +1449,13 @@ struct SDSegmentedStainViewDistanceStruct {
 - (void)setIsNewCircleColor:(UIColor *)isNewCircleColor
 {
     _isNewCircleColor = isNewCircleColor;
-    if (isNewCircleColor != nil)
-    {
-        self.isNewCircleView.backgroundColor = isNewCircleColor;
-    }
+    [self updateIsNewColor];
+}
+
+- (void)setIsNewCircleSelectedColor:(UIColor *)isNewCircleSelectedColor
+{
+    _isNewCircleSelectedColor = isNewCircleSelectedColor;
+    [self updateIsNewColor];
 }
 
 - (void)setIsNewCircleDiameter:(NSInteger)isNewCircleDiameter
@@ -1482,12 +1470,18 @@ struct SDSegmentedStainViewDistanceStruct {
     _isNew = isNew;
     if (isNew)
     {
-        self.isNewCircleView.hidden = self.selected;
+        self.isNewCircleView.hidden = NO;
+        [self updateIsNewColor];
     }
     else
     {
         self.isNewCircleView.hidden = YES;
     }
+}
+
+- (void)updateIsNewColor
+{
+    self.isNewCircleView.backgroundColor = self.isSelected ? self.isNewCircleSelectedColor : self.isNewCircleColor;
 }
 
 @end
