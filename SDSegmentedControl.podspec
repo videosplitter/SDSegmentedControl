@@ -37,7 +37,6 @@ Pod::Spec.new do |s|
   s.source_files = '*.{h,m}'
   s.ios.frameworks = 'QuartzCore'
   s.dependency 'AtkDragAndDrop'
-  s.libraries = 'AtkDragAndDrop'
   s.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SRCROOT)/AtkDragAndDrop/Classes/' }
 
 end
